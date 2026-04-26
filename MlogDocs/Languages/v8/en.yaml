@@ -570,7 +570,7 @@ instructions:
             {br} {code:cell1:variable draw} is where to get the value from, a {link:builref:#building-reference}, for example {code:bank1:variable} for banks, {code:processor1:variable} for processors.
             {br}{code:at:field} is location within the object you are reading from. 
             {br}for example, a cells can store up to 64 values, this means there are  64 available addresses, starting at {hl:_0:yel}, meaning {hl:_0:yel} - {hl:_63:yel}. If there is a value of {hl:_10:yel} at {hl:_0:yel} in {code:cell1:variable draw}, then if you put {hl:_0:yel} in the {code:at:field} field the {code:result:variable draw} variable will be {hl:_10:yel}.
-            {br}For reading variables from other processor you have to put that variable name in a string and on the {code:at:field} field. for example there is a variable in {code:processor1:variable} called {code:that_variable:variable}, you need to put {code:that_variable1:variable draw} (with quotes) on the {code:at:field} field, {code:result:variable draw} will then return whatever the value of {code:that_variable:variable} currently in {code:processor1:variable}.
+            {br}For reading variables from other processor you have to put that variable name in a string and on the {code:at:field} field. for example there is a variable in {code:processor1:variable} called {code:that_variable:variable}, you need to put {code:processor1:variable} on the second field and {code:that_variable1:variable draw} (with quotes) on the {code:at:field} field, {code:result:variable draw} will then return whatever the value of {code:that_variable:variable} currently in {code:processor1:variable}.
             {br}For reading strings simply put {code:strings:variable} on the second field (where {code:cell1:variable draw} currently is on the picture above) and index on the {code:at:field} field. For example if you put {code:strings:variable} then {hl:_0:yel} on the {code:at:field} field then {code:result:variable draw} will return {hl:_115:yel} because the UTF-16 decimal value of "s" is {hl:_115:yel}
         result: result
         cell1: cell1
@@ -598,7 +598,7 @@ instructions:
             {br} {code:cell1:variable draw} is where to write the value to, a {link:builref:#building-reference}, for example {code:bank1:variable} for banks, {code:processor1:variable} for processors.
             {br}{code:at:field} is location within the object you are writing to. 
             {br}for example, a cells can store up to 64 values, this means there are  64 available addresses, starting at {hl:_0:yel}, meaning {hl:_0:yel} - {hl:_63:yel}. if you put {hl:_0:yel} in the {code:at:field} field that value in that cell will change to whatever the value of {code:result:variable draw} variable will is.
-            {br}For writing variables to other processor you have to put that variable name in a string and on the {code:at:field} field. for example there is a variable in {code:processor1:variable} called {code:that_variable:variable}, you need to put {code:that_variable1:variable draw} (with quotes) on the {code:at:field} field, then the value of {code:that_variable:variable} will then be changed to whatever the value of {code:result:variable draw} currently is.
+            {br}For writing variables to other processor you have to put that variable name in a string and on the {code:at:field} field. for example there is a variable in {code:processor1:variable} called {code:that_variable:variable}, you need to put {code:processor1:variable} on the second field and {code:that_variable1:variable draw} (with quotes) on the {code:at:field} field, then the value of {code:that_variable:variable} will then be changed to whatever the value of {code:result:variable draw} currently is.
         result: result
         cell1: cell1
         bank1: bank1
@@ -700,6 +700,23 @@ instructions:
             y: y
             y2: y2
             y3: y3
+        print:
+            title: Print
+            content: |
+                Draw text from the print buffer. only ASCII characters allowed. clears the print buffer. still needs to be draw flushed.
+                {img:image/drawprint.png:mwidth80vw}
+                {br}{code:x:field} where the origin of the text will be in the x axis.
+                {br}{code:y:field} where the origin of the text will be in the y axis.
+                {br}{code:align:field} where to draw the text relative to the origin.
+                {br}for example for {code:bottomleft:content-name} the text will be on the top left relative to the position of the origin, so the origin is on the bottom left of the text, this means the text will grow to the right.
+                {br}for {code:center:content-name} the origin will be in the middle of the text, this means the text will grow equally to the right and left.
+                {br}as far as i know, there isn't an option to make the text larger, but you can use draw scale, but this just enlarges it, it doesn't make the text
+                higher resolution
+            x: x
+            y: y
+            align: align
+            bottomleft: "@bottomLeft"
+            center: "@center"
         image:
             title: Image
             content: |
@@ -746,6 +763,18 @@ instructions:
                     Example of HEX color code is {code:FF0000} for red, you can simply search “hex color picker” on google to choose your own color
                 brackets: " [ ] "
                 FF0000: "#FF0000"
+            format:
+                title: Formats
+                content: |
+                    allows you to print variables in a string, instead of using multiple prints instruction
+                    {br}the pattern is \{0-9\}
+                    {br}
+                    {br}example:
+                    {br}{img:image/format.png:_}
+                    {img:image/format 1.png:_}
+                    {br}the first format will take \{0\} and the second format will take \{1\}.
+                    {br}can only go up to 9.
+                    {br}Format can also take strings directly.
             emoji:
                 title: Emoji/icons
                 content: |
@@ -2036,15 +2065,62 @@ world_logic:
     set_prop:
         title: "Set Prop"
         content: |
-            sets the properties of a unit or building
-            {br}{span:codeoffield_unitbuilding_reference_brcod:spin}
+            {img:image/set prop.png:mwidth85vw}
+            {br}sets the properties of a unit or building
+            {code:of:field} unit/building Reference
+            {br}{code:to:field} value
             {br}{span:TOADD:toadd}
         TOADD: TOADD
         of: "of"
         to: "to"
-        codeoffield_unitbuilding_reference_brcod: |
-            {code:of:field} unit/building Reference
-            {br}{code:to:field} value
+        list:
+            x:
+                title: "@x"
+                content: sets the location x of the object
+            y:
+                title: "@y"
+                content: sets the location y of the object
+            velocityx:
+                title: "@velocityX"
+                content: sets the velocity of the x axis of the object
+            velocityy:
+                title: "@velocityY"
+                content: sets the velocity of the y axis of the object
+            rotation:
+                title: "@rotation"
+                content: sets the rotation of the object, follows mindustry angle system
+            speed:
+                title: "@speed"
+                content: Sets the max speed of the object
+            armor:
+                title: "@armor"
+                content:
+            health:
+                title: "@health"
+                content: Sets the health of the object (not max health)
+            shield:
+                title: "@shield"
+                content:
+            team:
+                title: "@team"
+                content:
+            flag:
+                title: "@flag"
+                content:
+            totalpower:
+                title: "@totalPower"
+                content:
+            payloadtype:
+                title: "@payloadType"
+                content:
+            bullettime:
+                title: "@bulletTime"
+                content:
+            bulletlifetime:
+                title: "@bulletLifetime"
+                content:
+
+
 
     make_marker:
         title: "Make Marker"
@@ -2312,11 +2388,8 @@ bleeding_edge:
     drawflush: "drawflush"
     draw_image_0_0_display1_32_0_0: "draw image 0 0 display1 32 0 0"
     drawflush_display2: "drawflush display2"
-    title9: "Draw print"
-    content10: |
-        Draw text from the print buffer. only ASCII characters allowed. clears the print buffer. still needs to be draw flushed
-        {br}as far as i know, there isn't an option to make the text larger, but you can use draw scale, but this just enlarges it, it doesn't make the text
-        higher resolution
+    title9: "{delete:1}"
+    content10: "{delete:0:1}"
     title10: "Draw Translate"
     content11: |
         Translate / offset the display coordinates, this instruction is cumulative, meaning it translate it by the specified number every flush.
@@ -2335,17 +2408,8 @@ bleeding_edge:
         self explanatory, rotate the display coordinates by a degree, also cumulative and stored in the display like translate and scale.
     title13: "Draw Reset"
     content14: "resets all previous translate,scale,and rotate / will make your display coordinates normal / as it was like a new one."
-    title14: "Format"
-    content15: |
-        allows you to print a variable or something else inside a string, if you know python it's similar to
-        {br}f”string text \{variable\}”, where `variable` can be anything, int, float, or another string.
-        {br}
-        {br}the pattern is \{0-9\}
-        {br}
-        {br}example:
-        {br}{img:image/format.png:_}
-        {img:image/format 1.png:_}
-        {br}the first format will take \{0\} and the second format will take \{1\}
+    title14: "{delete:1}"
+    content15: "{delete:0:1}"
     title15: "Play Sound"
     content16: |
         {br}plays a sound from the game’s sfx, include all of the game’s .ogg file, can be found in sounds folder.

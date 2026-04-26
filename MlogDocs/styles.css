@@ -687,6 +687,10 @@ ol.custom-list li::before {
     margin-bottom: -8px;
 }
 
+.mb0 {
+    margin-bottom: 0;
+}
+
 .ytlink {
     background-color: var(--secondary-color);
     color: black;

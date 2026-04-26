@@ -673,6 +673,9 @@ instructions:
             y: y
             y2: y2
             y3: y3
+        print:
+            title: "{delete:1}"
+            content: "{delete:0}"
         image:
             title: Image
             content: |
@@ -719,6 +722,9 @@ instructions:
                     Example of HEX color code is {code:FF0000} for red, you can simply search “hex color picker” on google to choose your own color
                 brackets: " [ ] "
                 FF0000: "#FF0000"
+            format:
+                title: "{delete:0}"
+                content: "{delete:0}"
             emoji:
                 title: Emoji/icons
                 content: |
@@ -2000,12 +2006,60 @@ world_logic:
     set_prop:
         title: "Set Prop"
         content: |
+            {img:image/set prop.png:mwidth85vw}
             sets the properties of a unit or building
             {br}{span:codeoffield_unitbuilding_reference_brcod:spin}
             {br}{span:TOADD:toadd}
         TOADD: TOADD
         of: "of"
         to: "to"
+        list:
+            x:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            y:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            velocityx:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            velocityy:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            rotation:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            speed:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            armor:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            health:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            shield:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            team:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            flag:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            totalpower:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            payloadtype:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            bullettime:
+                title: "{delete:0}"
+                content: "{delete:0}"
+            bulletlifetime:
+                title: "{delete:0}"
+                content: "{delete:0}"
+
         codeoffield_unitbuilding_reference_brcod: |
             {code:of:field} unit/building Reference
             {br}{code:to:field} value
