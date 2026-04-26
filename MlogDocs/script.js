@@ -505,8 +505,8 @@ async function loadLang(version, lang) {
 }
 
 // Load default language (v7 English)
-// loadLang("v7", "en").then(() => {
-loadLang("v8", "en").then(() => {
+loadLang("v7", "en").then(() => {
+// loadLang("v8", "en").then(() => {
   // Optional operations needed to be done after loading
   let img = document.querySelector('img[src="image/ui1.png"]');
   let elementsToWrap = []
