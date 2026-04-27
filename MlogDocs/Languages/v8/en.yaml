@@ -105,6 +105,8 @@ table_of_contents:
     get-flag: Get Flag
     set-flag: Set Flag
     set-prop: Set Prop
+    make-marker: Make Marker
+    set-marker: Set Marker
     
     bleeding-edge: Bleeding Edge(WIP)
 
@@ -135,7 +137,7 @@ table_of_contents:
     world-processor: World Processor
     lookup-ids: Lookup Id(s)
     dblockbehaviour: Disabled block behaviour
-    
+
     Contributors: Contributors
 
 foreword:
@@ -557,34 +559,59 @@ instructions:
     read:
         title: Read
         content: |
-            Read a value from a cell
+            Read a value from a certain object. this instruction can:
+            {br}Read a value from a cell.
+            {br}Read a variable value from other processor.
+            {br}Read strings directly and returning UTF-16 decimal value.
             {br}
             {img:image/read.png:mwidth85vw}
             {br}
             {code:result:variable draw} is your variable name
-            {br} {code:cell1:variable draw} is where to get the value from, a {link:builref:#building-reference}, “bank\{number\}” for Banks
-            {br}`{hl:_0:yel}` is the cell’s address. like said above, cells can store up to 64 values, this means there are only 64 addresses, starting at {hl:_0:yel}, meaning {hl:_0:yel} - {hl:_63:yel}
-            {br} Example: there is a value at 0 in {code:cell1:variable draw} that is {hl:_10:yel}, then {code:result:variable draw} variable will be {hl:_10:yel}
+            {br} {code:cell1:variable draw} is where to get the value from, a {link:builref:#building-reference}, for example {code:bank1:variable} for banks, {code:processor1:variable} for processors.
+            {br}{code:at:field} is location within the object you are reading from. 
+            {br}for example, a cells can store up to 64 values, this means there are  64 available addresses, starting at {hl:_0:yel}, meaning {hl:_0:yel} - {hl:_63:yel}. If there is a value of {hl:_10:yel} at {hl:_0:yel} in {code:cell1:variable draw}, then if you put {hl:_0:yel} in the {code:at:field} field the {code:result:variable draw} variable will be {hl:_10:yel}.
+            {br}For reading variables from other processor you have to put that variable name in a string and on the {code:at:field} field. for example there is a variable in {code:processor1:variable} called {code:that_variable:variable}, you need to put {code:processor1:variable} on the second field and {code:that_variable1:variable draw} (with quotes) on the {code:at:field} field, {code:result:variable draw} will then return whatever the value of {code:that_variable:variable} currently in {code:processor1:variable}.
+            {br}For reading strings simply put {code:strings:variable} on the second field (where {code:cell1:variable draw} currently is on the picture above) and index on the {code:at:field} field. For example if you put {code:strings:variable} then {hl:_0:yel} on the {code:at:field} field then {code:result:variable draw} will return {hl:_115:yel} because the UTF-16 decimal value of "s" is {hl:_115:yel}
         result: result
         cell1: cell1
+        bank1: bank1
+        processor1: processor1
+        that_variable: that_variable
+        that_variable1: '"that_variable"'
+        strings: '"strings"'
         builref: building reference
         _0: "0"
+        at: at
         _63: "63"
+        _115: "115"
         _10: "10"
     write:
         title: Write
         content: |
-            Write a value to a cell{br}
+            Write a value from a certain object. this instruction can:
+            {br}write a value from to cell.
+            {br}write/change the value of a variable on other processor.
+            {br}
             {img:image/write.png:mwidth85vw}
             {br}
-            Essentially the same with read but it writes instead
-            {br}
-            Example: the {code:result:variable draw} variable is {hl:_10:yel}, then it will write {hl:_10:yel} to {code:cell1:variable draw} at #0
-            {br}
-            Can also be directly written using a number instead of a variable.
+            {code:result:variable draw} is your variable name
+            {br} {code:cell1:variable draw} is where to write the value to, a {link:builref:#building-reference}, for example {code:bank1:variable} for banks, {code:processor1:variable} for processors.
+            {br}{code:at:field} is location within the object you are writing to. 
+            {br}for example, a cells can store up to 64 values, this means there are  64 available addresses, starting at {hl:_0:yel}, meaning {hl:_0:yel} - {hl:_63:yel}. if you put {hl:_0:yel} in the {code:at:field} field that value in that cell will change to whatever the value of {code:result:variable draw} variable will is.
+            {br}For writing variables to other processor you have to put that variable name in a string and on the {code:at:field} field. for example there is a variable in {code:processor1:variable} called {code:that_variable:variable}, you need to put {code:processor1:variable} on the second field and {code:that_variable1:variable draw} (with quotes) on the {code:at:field} field, then the value of {code:that_variable:variable} will then be changed to whatever the value of {code:result:variable draw} currently is.
         result: result
-        _10: "10"
         cell1: cell1
+        bank1: bank1
+        processor1: processor1
+        that_variable: that_variable
+        that_variable1: '"that_variable"'
+        strings: '"strings"'
+        builref: building reference
+        _0: "0"
+        at: at
+        _63: "63"
+        _115: "115"
+        _10: "10"
         
     draw:
         title: Draw
@@ -674,8 +701,22 @@ instructions:
             y2: y2
             y3: y3
         print:
-            title: "{delete:1}"
-            content: "{delete:0}"
+            title: Print
+            content: |
+                Draw text from the print buffer. only ASCII characters allowed. clears the print buffer. still needs to be draw flushed.
+                {img:image/drawprint.png:mwidth80vw}
+                {br}{code:x:field} where the origin of the text will be in the x axis.
+                {br}{code:y:field} where the origin of the text will be in the y axis.
+                {br}{code:align:field} where to draw the text relative to the origin.
+                {br}for example for {code:bottomleft:content-name} the text will be on the top left relative to the position of the origin, so the origin is on the bottom left of the text, this means the text will grow to the right.
+                {br}for {code:center:content-name} the origin will be in the middle of the text, this means the text will grow equally to the right and left.
+                {br}as far as i know, there isn't an option to make the text larger, but you can use draw scale, but this just enlarges it, it doesn't make the text
+                higher resolution
+            x: x
+            y: y
+            align: align
+            bottomleft: "@bottomLeft"
+            center: "@center"
         image:
             title: Image
             content: |
@@ -723,8 +764,17 @@ instructions:
                 brackets: " [ ] "
                 FF0000: "#FF0000"
             format:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: Formats
+                content: |
+                    allows you to print variables in a string, instead of using multiple prints instruction
+                    {br}the pattern is \{0-9\}
+                    {br}
+                    {br}example:
+                    {br}{img:image/format.png:_}
+                    {img:image/format 1.png:_}
+                    {br}the first format will take \{0\} and the second format will take \{1\}.
+                    {br}can only go up to 9.
+                    {br}Format can also take strings directly.
             emoji:
                 title: Emoji/icons
                 content: |
@@ -1855,6 +1905,12 @@ world_logic:
             {br}{span:set_the_dark_part_of_light_colors_in_oth:spin}
             {br}solarMultiplier
             {br}{span:set_the_multiplier_solar_panels_produce_:spin}
+            {br}dragMultiplier
+            {br}
+            {br}ban
+            {br}
+            {br}unban
+            {br}
             {br}unitBuildSpeed
             {br}{span:set_the_build_speed_of_units:spin}
             {br}unitHealth
@@ -1939,7 +1995,7 @@ world_logic:
     explosion:
         title: "Explosion"
         content: |
-            {img:image/explosion.png:mwidth85vw}
+            {img:image/v8_explosion.png:mwidth85vw}
             {br}create an explosion
         content2: |
             {code:team:field} what team the explosion belong to, explosion cannot harm ally blocks
@@ -1949,6 +2005,7 @@ world_logic:
             {br}{code:air:field} whether to damage air or nor, true means it will damage air (air units, boosted units, etc)
             {br}{code:ground:field} whether to damage ground or nor, true means it will damage ground (ground unit, blocks, etc)
             {br}{code:pierce:field} whether to pierce buildings or not, if false, it will need a line of sight from the explosion to the block, if something is in the way that block will not be damaged
+            {br}{code:effect:field} whether to pierce show the visual effect of the explosion or not
         team: "team"
         x: "x"
         y: "y"
@@ -1957,6 +2014,8 @@ world_logic:
         air: "air"
         ground: "ground"
         pierce: "pierce"
+        effect: "effect"
+
     set_rate:
         title: "Set Rate"
         content: "Set the speed of the processor, in instruction per tick, 1 second = 60 ticks"
@@ -2007,68 +2066,260 @@ world_logic:
         title: "Set Prop"
         content: |
             {img:image/set prop.png:mwidth85vw}
-            sets the properties of a unit or building
-            {br}{span:codeoffield_unitbuilding_reference_brcod:spin}
+            {br}sets the properties of a unit or building
+            {code:of:field} unit/building Reference
+            {br}{code:to:field} value
             {br}{span:TOADD:toadd}
         TOADD: TOADD
         of: "of"
         to: "to"
         list:
             x:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@x"
+                content: sets the location x of the object
             y:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@y"
+                content: sets the location y of the object
             velocityx:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@velocityX"
+                content: sets the velocity of the x axis of the object
             velocityy:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@velocityY"
+                content: sets the velocity of the y axis of the object
             rotation:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@rotation"
+                content: sets the rotation of the object, follows mindustry angle system
             speed:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@speed"
+                content: Sets the max speed of the object
             armor:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@armor"
+                content:
             health:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@health"
+                content: Sets the health of the object (not max health)
             shield:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@shield"
+                content:
             team:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@team"
+                content:
             flag:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@flag"
+                content:
             totalpower:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@totalPower"
+                content:
             payloadtype:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@payloadType"
+                content:
             bullettime:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@bulletTime"
+                content:
             bulletlifetime:
-                title: "{delete:0}"
-                content: "{delete:0}"
+                title: "@bulletLifetime"
+                content:
 
-        codeoffield_unitbuilding_reference_brcod: |
-            {code:of:field} unit/building Reference
-            {br}{code:to:field} value
+
+
     make_marker:
-        title: "{delete:2}"
-        content: 
+        title: "Make Marker"
+        content: |
+            Makes a Marker
+            {br}a marker is an entity in the map that shows content to the user, for example when you select a unit (shift + drag click) a diamond
+            shaped box appear around that unit, that is a marker, or when you tell a unit to move a line appears, that is also considered a marker,
+            the floating text in the beginning tutorial is also a marker.
+            {br}
+            {br}{code:id:field} is numeric identity of the Marker, id is 32 bit signed integer, meaning from -2147483648 to 2147483647, outside these range markers will be clamped to these values
+            {br}for example 2147483647 and 2147483648 will both be considered as 2147483647
+            {br}however note that the total number of markers is limited to 20.000
+            {br}
+            {br}game created markers like the examples above doesn't intervere with player made markers
+            {br}currently there is a bug with the {code:replace:field} argument where it replaces other markers than the specified id
+            {br}
+            {br}{code:x:field}, {code:y:field}
+            {br}marker location with the middle of the marker as its origin
+            {br}
+            {br}{code:replace:field} determines whether this marker will replace exsisting previous markers that has the same id
+            {br}it is recommended to just keep it false
+            {br}
+            {br}{code:shapetext:field}
+            {br}a rectangular shape with a text above it
+            {br}
+            {br}{code:point:field}
+            {br}an expanding red circle
+            {br}
+            {br}{code:shape:field}
+            {br}a rectangular shape
+            {br}
+            {br}{code:text:field}
+            {br}a text with a semi transparant black background
+            {br}
+            {br}{code:line:field}
+            {br}a line
+            {br}
+            {br}{code:texture:field}, makes a marker for a Texture.
+            {br}initially invisible until texture is defined, using {code:setmarker_texture:wp}.
+            {br}texture can be anything that is available in the game.
+            {br}
+            {br}{code:quad:field}, are quadrilateral / a 4 sided polygon.
+            {br}a quad has 4 vertices and 4 sides.
+            {br}each vertices position can be set using {code:setmarker_posi:wp}.
+            {br}texture is initially just pure white, can be defined with {code:setmarker_texture:wp},
+            {br}then needs to be further defined with {code:setmarker_uvi:wp} to set the texture location within the quad.
+        id: "id"
+        replace: "replace"
+        x: "x"
+        y: "y"
+        shapetext: "shapeText"
+        point: "point"
+        shape: "shape"
+        text: "text"
+        line: "line"
+        texture: "Texture"
+        setmarker_texture: "setmarker texture"
+        quad: "Quad"
+        setmarker_posi: "setmarker posi"
+        setmarker_uvi: "setmarker uvi"
+
+
     set_marker:
-        title: "{delete:2}"
-        content: 
+        title: "Set Marker"
+        content: |
+            {img:image/v8_setmarker.png:_}
+            {br}Sets a property of a marker with the specified id.
+            {br}{br}setting a {code:null} value to any fields in {code:setmarker:wp}
+            will {b:not} change the value to 0, but instead just kept the previous value of that marker.
+            {br}
+            {br}{code:remove:field}
+            {br}remove the marker
+            {br}
+            {br}{code:world:field}
+            {br}
+            {br}
+            {br}{code:minimap:field}
+            {br}
+            {br}
+            {br}{code:autoscale:field}
+            {br}automatically scales the size of the marker depending on player camera zoom
+            {br}
+            {br}{code:pos:field}
+            {br}repositions the marker
+            {br}
+            {br}{code:endpos:field}
+            {br}used for positioning the other end of the {code:line:field} marker
+            {br}
+            {br}{code:drawlayer:field}
+            {br}sets the layer where the markers sits on, a higher number means it will overlap objects with lower numbers
+            {br}if you're familiar with programming it is sometimes called the "z-index"
+            {br}
+            {br}{code:color:field}
+            {br}sets the color of the marker
+            {br}
+            {br}{code:radius:field}
+            {br}
+            {br}
+            {br}{code:stroke:field}
+            {br}
+            {br}
+            {br}{code:rotation:field}
+            {br}
+            {br}
+            {br}{code:shape:field}
+            {br}
+            {br}
+            {br}{code:arc:field}
+            {br}
+            {br}
+            {br}{code:flushtext:field}
+            {br}
+            {br}
+            {br}{code:fontsize:field}
+            {br}
+            {br}
+            {br}{code:textheight:field}
+            {br}
+            {br}
+            {br}{code:labelflags:field}
+            {br}
+            {br}
+            {br}{code:texture:field}, sets the texure of a marker.
+            {br}the {code:printflush:field} argument are boolean,
+            {br}when true it uses the text in the text buffer as the name,
+            {br}otherwise uses the {code:name:field} argument.
+            {br}name can be game content name, like {code:router:content-name}, or {code:surgealloy:content-name}, if doesn't work use file name instead.
+            {br}can also be file name, like {code:itemcopper} or {code:spritesnoisepng},
+            {br}when using a file name, write it exactly like shown above, including quotes, {b:not_like} {code:spritesnoisepng} or {code:spritesnoisepng2}.
+            {br}file names can be found on {link:httpsgithubcomanukenmindustrytreemasterc:https://github.com/Anuken/Mindustry/tree/master/core/assets-raw/sprites}
+            {br}
+            {br}the {code:name:field} argument now supports block reference too, so you can set the texture of a marker to a display's content by putting the display block reference on the {code:name:field} argument. like {code:setmarker_texture_0_0_display1_0:wp}
+            {br}content is live, meaning if the display content changes the marker texture will also change in realtime.
+            {br}
+            {br}{code:texturesize:field}
+            {br}
+            {br}
+            {br}{code:posi:field}, sets the vertices location of a quad, location are world x,y location
+            {br}with index from 0-3
+            {br}each index repesents each vertices
+            {br}
+            {br}{code:uvi:field}, sets each vertices of the texture relative to the quad (UV Mapping with index)
+            {br}with index from 0-3
+            {br}each index repesents each vertices, example:
+            {br}#0 (0,0)
+            {br}#1 (1,0)
+            {br}#2 (1,1)
+            {br}#3 (0,1)
+            {br}will sets each texture vertices exactly where the quad vertices are, this means texture will stretch/reform to the quad shapes
+            {br}
+            {br}{code:colori:field}, similar to uvi, if indexes are set to different colors; color will gradient from one to the other
+            {br}with index from 0-3
+            {br}each index repesents each vertices, example:
+            {br}#0 (0,0)
+            {br}#1 (1,0)
+            {br}#2 (1,1)
+            {br}#3 (0,1)
+            {br}
+            {br}{code:color:field}, change the color of the marker.
+            {br}color only tints the color of the marker,
+            {br}meaning a marker that already has a color, like setting the color of a texture to white doesn't effect them, it will appear as its original texture color,
+            {br}since quad doesn't have a color quad will take the full color the specified color.
+            {br}{br}{span:TOADD:toadd}
+        setmarker: "setmarker"
+        remove: "remove"
+        world: "world"
+        minimap: "minimap"
+        autoscale: "autoscale"
+        pos: "pos"
+        endpos: "endPos"
+        drawlayer: "drawLayer"
+        color: "color"
+        radius: "radius"
+        stroke: "stroke"
+        rotation: "rotation"
+        arc: "arc"
+        flushtext: "flushText"
+        fontsize: "fontSize"
+        textheight: "textHeight"
+        labelflags: "labelFlags"
+        printflush: "printFlush"
+        name: "name"
+        router: "@router"
+        surgealloy: "@surge-alloy"
+        itemcopper: "\"item-copper\""
+        spritesnoisepng: "sprites/noise.png"
+        spritesnoisepng2: "@sprites/noise.png"
+        setmarker_texture_0_0_display1_0: "setmarker texture 0 0 display1 0"
+        texturesize: "textureSize"
+        posi: "posi"
+        uvi: "uvi"
+        colori: "colori"
+        httpsgithubcomanukenmindustrytreemasterc: "https://github.com/Anuken/Mindustry/tree/master/core/assets-raw/sprites"
+        not: "not"
+        not_like: "NOT LIKE"
+        null: "null"
+        line: "line"
+        shape: "shape"
+        texture: "Texture"
 
 
 bleeding_edge:
@@ -2085,20 +2336,8 @@ bleeding_edge:
     TOADD: TOADD
     httpsgithubcomanukenmindustrybuilds: "https://github.com/Anuken/MindustryBuilds"
     cardillan: "Cardillan"
-    title2: "Read and Write"
-    content2: |
-        - the read and write instruction now supports writing and reading directly to another processor.
-        {br}by putting "string" on the {code:at:field} field and the processor reference on the
-        {code:to:field} field, you can directly change the value of that variable in that processor
-        {br}
-        {br}- now supports reading strings, An UTF-16 value will be returned for the selected character of the string
-        {br}example:
-        {br}{code:read_result_mindustry_at_0:draw}
-        {br}will return 77, which is the UTF-16 value of M, at 1 will return 105, which is the UTF-16 value of i, and so on
-        {br}
-        {br}- Now can access individual pixels in erekir canvas
-        {br}
-        {br}- Now can access individual characters on a message block with an index. A UTF-16 value of the character is returned. if out of range returns {code:null}
+    title2: "{delete:1}"
+    content2: "{delete:0:1}"
     at: "at"
     to: "to"
     read_result_mindustry_at_0: "read result = \"Mindustry\" at 0"
@@ -2149,11 +2388,8 @@ bleeding_edge:
     drawflush: "drawflush"
     draw_image_0_0_display1_32_0_0: "draw image 0 0 display1 32 0 0"
     drawflush_display2: "drawflush display2"
-    title9: "Draw print"
-    content10: |
-        Draw text from the print buffer. only ASCII characters allowed. clears the print buffer. still needs to be draw flushed
-        {br}as far as i know, there isn't an option to make the text larger, but you can use draw scale, but this just enlarges it, it doesn't make the text
-        higher resolution
+    title9: "{delete:1}"
+    content10: "{delete:0:1}"
     title10: "Draw Translate"
     content11: |
         Translate / offset the display coordinates, this instruction is cumulative, meaning it translate it by the specified number every flush.
@@ -2172,17 +2408,8 @@ bleeding_edge:
         self explanatory, rotate the display coordinates by a degree, also cumulative and stored in the display like translate and scale.
     title13: "Draw Reset"
     content14: "resets all previous translate,scale,and rotate / will make your display coordinates normal / as it was like a new one."
-    title14: "Format"
-    content15: |
-        allows you to print a variable or something else inside a string, if you know python it's similar to
-        {br}f”string text \{variable\}”, where `variable` can be anything, int, float, or another string.
-        {br}
-        {br}the pattern is \{0-9\}
-        {br}
-        {br}example:
-        {br}{img:image/format.png:_}
-        {img:image/format 1.png:_}
-        {br}the first format will take \{0\} and the second format will take \{1\}
+    title14: "{delete:1}"
+    content15: "{delete:0:1}"
     title15: "Play Sound"
     content16: |
         {br}plays a sound from the game’s sfx, include all of the game’s .ogg file, can be found in sounds folder.
@@ -2203,50 +2430,8 @@ bleeding_edge:
     content17: "sense the current weather is the specified weather type, returns boolean"
     title17: "Weather Set"
     content18: "set the current state of the weather to the specified type"
-    title18: "Make Marker"
-    content19: |
-        Makes a Marker
-        {br}a marker is an entity in the map that shows content to the user, for example when you select a unit (shift + drag click) a diamond
-        shaped box appear around that unit, that is a marker, or when you tell a unit to move a line appears, that is also considered a marker,
-        the floating text in the beginning tutorial is also a marker.
-        {br}
-        {br}{code:id:field} is numeric identity of the Marker, id is 32 bit signed integer, meaning from -2147483648 to 2147483647, outside these range markers will be clamped to these values
-        {br}for example 2147483647 and 2147483648 will both be considered as 2147483647
-        {br}however note that the total number of markers is limited to 20.000
-        {br}
-        {br}game created markers like the examples above doesn't intervere with player made markers
-        {br}currently there is a bug with the {code:replace:field} argument where it replaces other markers than the specified id
-        {br}
-        {br}{code:x:field}, {code:y:field}
-        {br}marker location with the middle of the marker as its origin
-        {br}
-        {br}{code:replace:field} determines whether this marker will replace exsisting previous markers that has the same id
-        {br}it is recommended to just keep it false
-        {br}
-        {br}{code:shapetext:field}
-        {br}a rectangular shape with a text above it
-        {br}
-        {br}{code:point:field}
-        {br}an expanding red circle
-        {br}
-        {br}{code:shape:field}
-        {br}a rectangular shape
-        {br}
-        {br}{code:text:field}
-        {br}a text with a semi transparant black background
-        {br}
-        {br}{code:line:field}
-        {br}a line
-        {br}
-        {br}{code:texture:field}, makes a marker for a Texture.
-        {br}initially invisible until texture is defined, using {code:setmarker_texture:wp}.
-        {br}texture can be anything that is available in the game.
-        {br}
-        {br}{code:quad:field}, are quadrilateral / a 4 sided polygon.
-        {br}a quad has 4 vertices and 4 sides.
-        {br}each vertices position can be set using {code:setmarker_posi:wp}.
-        {br}texture is initially just pure white, can be defined with {code:setmarker_texture:wp},
-        {br}then needs to be further defined with {code:setmarker_uvi:wp} to set the texture location within the quad.
+    title18: "{delete:1}"
+    content19: "{delete:0}"
     id: "id"
     replace: "replace"
     x: "x"
@@ -2262,137 +2447,8 @@ bleeding_edge:
     setmarker_posi: "setmarker posi"
     setmarker_uvi: "setmarker uvi"
     content20: "{br}{span:TOADD:toadd}"
-    title19: "Set Marker"
-    content21: |
-        Sets a property of a marker with the specified id.
-        {br}{br}setting a {code:null} value to any fields in {code:setmarker:wp}
-        will {b:not} change the value to 0, but instead just kept the previous value of that marker.
-        {br}
-        {br}{code:remove:field}
-        {br}remove the marker
-        {br}
-        {br}{code:world:field}
-        {br}
-        {br}
-        {br}{code:minimap:field}
-        {br}
-        {br}
-        {br}{code:autoscale:field}
-        {br}automatically scales the size of the marker depending on player camera zoom
-        {br}
-        {br}{code:pos:field}
-        {br}repositions the marker
-        {br}
-        {br}{code:endpos:field}
-        {br}used for positioning the other end of the {code:line:field} marker
-        {br}
-        {br}{code:drawlayer:field}
-        {br}sets the layer where the markers sits on, a higher number means it will overlap objects with lower numbers
-        {br}if you're familiar with programming it is sometimes called the "z-index"
-        {br}
-        {br}{code:color:field}
-        {br}sets the color of the marker
-        {br}
-        {br}{code:radius:field}
-        {br}
-        {br}
-        {br}{code:stroke:field}
-        {br}
-        {br}
-        {br}{code:rotation:field}
-        {br}
-        {br}
-        {br}{code:shape:field}
-        {br}
-        {br}
-        {br}{code:arc:field}
-        {br}
-        {br}
-        {br}{code:flushtext:field}
-        {br}
-        {br}
-        {br}{code:fontsize:field}
-        {br}
-        {br}
-        {br}{code:textheight:field}
-        {br}
-        {br}
-        {br}{code:labelflags:field}
-        {br}
-        {br}
-        {br}{code:texture:field}, sets the texure of a marker.
-        {br}the {code:printflush:field} argument are boolean,
-        {br}when true it uses the text in the text buffer as the name,
-        {br}otherwise uses the {code:name:field} argument.
-        {br}name can be game content name, like {code:router:content-name}, or {code:surgealloy:content-name}, if doesn't work use file name instead.
-        {br}can also be file name, like {code:itemcopper} or {code:spritesnoisepng},
-        {br}when using a file name, write it exactly like shown above, including quotes, {b:not_like} {code:spritesnoisepng} or {code:spritesnoisepng2}.
-        {br}file names can be found on {link:httpsgithubcomanukenmindustrytreemasterc:https://github.com/Anuken/Mindustry/tree/master/core/assets-raw/sprites}
-        {br}
-        {br}the {code:name:field} argument now supports block reference too, so you can set the texture of a marker to a display's content by putting the display block reference on the {code:name:field} argument. like {code:setmarker_texture_0_0_display1_0:wp}
-        {br}content is live, meaning if the display content changes the marker texture will also change in realtime.
-        {br}
-        {br}{code:texturesize:field}
-        {br}
-        {br}
-        {br}{code:posi:field}, sets the vertices location of a quad, location are world x,y location
-        {br}with index from 0-3
-        {br}each index repesents each vertices
-        {br}
-        {br}{code:uvi:field}, sets each vertices of the texture relative to the quad (UV Mapping with index)
-        {br}with index from 0-3
-        {br}each index repesents each vertices, example:
-        {br}#0 (0,0)
-        {br}#1 (1,0)
-        {br}#2 (1,1)
-        {br}#3 (0,1)
-        {br}will sets each texture vertices exactly where the quad vertices are, this means texture will stretch/reform to the quad shapes
-        {br}
-        {br}{code:colori:field}, similar to uvi, if indexes are set to different colors; color will gradient from one to the other
-        {br}with index from 0-3
-        {br}each index repesents each vertices, example:
-        {br}#0 (0,0)
-        {br}#1 (1,0)
-        {br}#2 (1,1)
-        {br}#3 (0,1)
-        {br}
-        {br}{code:color:field}, change the color of the marker.
-        {br}color only tints the color of the marker,
-        {br}meaning a marker that already has a color, like setting the color of a texture to white doesn't effect them, it will appear as its original texture color,
-        {br}since quad doesn't have a color quad will take the full color the specified color.
-        {br}{br}{span:TOADD:toadd}
-    setmarker: "setmarker"
-    remove: "remove"
-    world: "world"
-    minimap: "minimap"
-    autoscale: "autoscale"
-    pos: "pos"
-    endpos: "endPos"
-    drawlayer: "drawLayer"
-    color: "color"
-    radius: "radius"
-    stroke: "stroke"
-    rotation: "rotation"
-    arc: "arc"
-    flushtext: "flushText"
-    fontsize: "fontSize"
-    textheight: "textHeight"
-    labelflags: "labelFlags"
-    printflush: "printFlush"
-    name: "name"
-    router: "@router"
-    surgealloy: "@surge-alloy"
-    itemcopper: "\"item-copper\""
-    spritesnoisepng: "sprites/noise.png"
-    spritesnoisepng2: "@sprites/noise.png"
-    setmarker_texture_0_0_display1_0: "setmarker texture 0 0 display1 0"
-    texturesize: "textureSize"
-    posi: "posi"
-    uvi: "uvi"
-    colori: "colori"
-    httpsgithubcomanukenmindustrytreemasterc: "https://github.com/Anuken/Mindustry/tree/master/core/assets-raw/sprites"
-    not: "not"
-    not_like: "NOT LIKE"
+    title19: "{delete:1}"
+    content21: "{delete:0:1}"
     title20: "Locale Print"
     # FIX {code:name} 
     content22: |
@@ -2480,23 +2536,11 @@ bleeding_edge:
     _8bin: "11111111 11111111 11111111 11111000"
     _8binshift: "11111111 11111111 11111111 11111000"
     _2147483644: "2147483644"
-    title27: "@cameraWidth and @cameraHeight"
-    content29: |
-        an object camera width/height, usually the players possesed object, eg turrets/units
-        {br}the width/height numbers are in blocks
-        {br}example:
-        {br}{code:sensor_width_unit_camerawidth:wp}, where {code:unit:variable} is the player
-        {br}a maxed zoomed out screen on a 1080x1920 screen width is 40, which means the viewable width is 40 blocks
-        {br}if the object is not a player/doesn't have a camera returns 0
+    title27: "{delete:1}"
+    content29: "{delete:0:1}"
     sensor_width_unit_camerawidth: "sensor width @unit @cameraWidth"
-    title28: "@cameraX and @cameraY"
-    content30: |
-        an object x/y camera location
-        {br}the x/y numbers are in the map coordinate system
-        {br}example:
-        {br}{code:sensor_x_unit_camerax:wp}, where {code:unit:variable}` is the player
-        {br}while moving the camera returns the camera position in the map coordinate location
-        {br}different from sensoring {code:x:content-name} since you can move the camera independently of the unit
+    title28: "{delete:1}"
+    content30: "{delete:0:1}"
     sensor_x_unit_camerax: "sensor x @unit @cameraX"
     title29: "@solid"
     content31: |
@@ -2983,17 +3027,21 @@ built_in_vars2:
             content: |
                 the y coordinate value of what that object is targeting, returns number, if used on a player will return their cursor position
         cameraX:
-            title: "{delete:0}"
-            content: "{delete:0}"
+            title: "@cameraX"
+            content: |
+                the x coordinate location of the object’s camera; returns number, if used on a player will return their camera position, if object doesn't have a camera returns 0, if used on an invalid object, returns null.
         cameraY:
-            title: "{delete:0}"
-            content: "{delete:0}"
+            title: "@cameraY"
+            content: |
+                the y coordinate location of the object’s camera; returns number, if used on a player will return their camera position, if object doesn't have a camera returns 0, if used on an invalid object, returns null.
         cameraWidth:
-            title: "{delete:0}"
-            content: "{delete:0}"
+            title: "@cameraWidth"
+            content: |
+                the width of the object’s camera view; returns number, if used on a player will return their camera view width, if object doesn't have a camera returns 0, if used on an invalid object, returns null.
         cameraHeight:
-            title: "{delete:0}"
-            content: "{delete:0}"
+            title: "@cameraHeight"
+            content: |
+                the height of the object’s camera view; returns number, if used on a player will return their camera view height, if object doesn't have a camera returns 0, if used on an invalid object, returns null.
         size:
             title: "@size"
             content: |

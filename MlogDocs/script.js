@@ -1,3 +1,6 @@
+// #################################################################################################################
+// renderTextWithTokens takes a string with tokens in the form {type:name:extra} and renders it into the given element, replacing tokens with the output of their respective resolvers. It also includes detailed error handling and logging for debugging issues with token resolution.
+
 function renderTextWithTokens(el, text, sectionData, _debugPath) {
   const frag = document.createDocumentFragment();
   const regex = /(?<!\\)\{(\w+)(?::([^:}]+)(?::([^}]+))?)?\}/g;
@@ -41,6 +44,42 @@ function renderTextWithTokens(el, text, sectionData, _debugPath) {
         ...(sectionData ? [sectionData] : []),
         ...(extra ? [extra]       : [])
       );
+      if (resolved && resolved.delete) {
+        const depth = resolved.depth || 0;
+        let top = el;
+        for (let i = 0; i < depth; i++) {
+          top = top.parentElement;
+        }
+        if (resolved.sibling) {
+          const split = resolved.sibling.split(' ');
+          const dist = parseInt(split[0], 10) || 0;
+          const mode = split[1] || '';
+          let siblingEl = top;
+          let siblingList = [];
+          for (let i = 0; i < Math.abs(dist); i++) {
+            siblingEl = dist > 0 ? siblingEl.nextElementSibling : siblingEl.previousElementSibling;
+            if (!siblingEl){
+              break;
+            }
+            siblingList.push(siblingEl);
+          }
+          if (siblingList.length > 0) {
+            if (mode == 'cascade') {
+              siblingList.forEach(sib => {
+                sib.classList.add('hidden');
+                console.info(`[i18n] Hidden sibling element at distance ${dist} from element at depth ${depth} for token "${fullMatch}" in key "${_debugPath ?? '(unknown)'}"`);
+              });
+            } else {
+              siblingList[siblingList.length - 1].classList.add('hidden');
+              console.info(`[i18n] Hidden sibling element at distance ${dist} from element at depth ${depth} for token "${fullMatch}" in key "${_debugPath ?? '(unknown)'}"`);
+            }
+          }
+        }
+        top.classList.add('hidden');
+        console.info(`[i18n] Hidden element at depth ${depth} for token "${fullMatch}" in key "${_debugPath ?? '(unknown)'}"`);
+        last = regex.lastIndex;
+        continue;
+      }
     } catch (err) {
       // Determine likely cause
       let hint = '';
@@ -81,6 +120,9 @@ function renderTextWithTokens(el, text, sectionData, _debugPath) {
   frag.append(text.slice(last).replace(/\\([{}])/g, '$1'));
   el.replaceChildren(frag);
 }
+
+// ####################################################################################################
+// Token resolvers take arguments (name, sectionData, extra) depending on the token type, and return either a string or a DOM element to be rendered in place of the token. If a resolver throws an error, the raw token will be rendered and an error will be logged to the console with details for debugging.
 
 const modal = document.getElementById('imageModal');
 const modalImg = document.getElementById('modalImage');
@@ -184,10 +226,13 @@ const tokenResolvers = {
     el.classList.add(...extra.split(' '));
     return el;
   },
-  pure(name) {
+  raw(name) {
     const el = document.createElement("span");
     el.innerHTML = name;
     return el;
+  },
+  delete(name, sectionData, extra) {
+    return {delete: true, depth: name ? parseInt(name) : 0, sibling: extra};
   }
 };
 
@@ -195,6 +240,8 @@ function resolveKey(path, obj) {
   return path.split(".").reduce((o, k) => o?.[k], obj);
 }
 
+// ############################################################################
+// Fetch YAML file and parse it, with error handling and i18n-specific logging
 async function fetchYaml(url) {
   let yamlText;
   try {
@@ -227,21 +274,149 @@ async function fetchYaml(url) {
   return data;
 }
 
+// ###########################################################################################################
+// Mapping of li classes to hrefs for auto-generating table of contents
+
+const liClassTolinksMap = {
+  "sub-title": [
+    "foreword",
+    "introduction",
+    "glossary",
+    "basic-concept",
+    "blocks",
+    "instructions",
+    "controlling-units",
+    "simple-logic-examples",
+    "advanced",
+    "world-logic",
+    "bleeding-edge",
+    "extras",
+    "self-promotion",
+    "appendix",
+    "Contributors"
+  ],
+  "indent1": [
+    "integers",
+    "float",
+    "boolean",
+    "strings",
+    "building-reference",
+    "contentname",
+    "processors",
+    "processors-ui",
+    "how-processor-run-its-code",
+    "links",
+    "variables",
+    "built-in-variables",
+    "constants",
+    "buffers",
+    "message",
+    "switch",
+    "display",
+    "cell",
+    "read",
+    "write",
+    "draw",
+    "draw-flush",
+    "print",
+    "print-flush",
+    "get-link",
+    "control",
+    "radar",
+    "sensor",
+    "set",
+    "operation",
+    "lookup",
+    "pack-color",
+    "wait",
+    "stop",
+    "end",
+    "jump",
+    "unit-bind",
+    "unit-control",
+    "unit-radar",
+    "unit-locate",
+    "universal-switch",
+    "shuttle-logic",
+    "thorium-reactor-fail-safe",
+    "counter-array",
+    "writing-in-text-editor",
+    "transpiler",
+    "mods",
+    "subframe",
+    "how-to-get-world-processor",
+    "get-block",
+    "set-block",
+    "spawn-unit",
+    "apply-status",
+    "spawn-wave",
+    "set-rule",
+    "flush-message",
+    "cutscene",
+    "effect",
+    "explosion",
+    "set-rate",
+    "fetch",
+    "sync",
+    "get-flag",
+    "set-flag",
+    "set-prop",
+    "make-marker",
+    "set-marker",
+
+    "mindustry-coordinate-system",
+    "configure-turns-to-config",
+    "you-cannot-spawn-scathe-missile",
+    "modded-items-and-draw-image",
+    "ai-chatbot-doenst-understand-mlog",
+    "getting-unit-cap",
+    "v6-unit-control-with-logic",
+    "damage-calculation",
+    "math",
+    "self-linking-processor",
+    "mloginvention",
+    "built-in-variables1",
+    "text-form-instruction",
+    "lookup-ids",
+    "dblockbehaviour"
+  ],
+  "indent2": [
+    "global",
+    "environment",
+    "sensors",
+    "blocks-and-items",
+    "units",
+    "normal-processor",
+    "world-processor"
+  ]
+};
+
 async function loadLang(version, lang) {
+  document.querySelectorAll('.lang-item').forEach(el => el.classList.remove('lang-active'));
+  document.getElementById(`${version}_${lang}`).classList.add("lang-active")
+  // document.getElementById(`${version}_${lang}`).classList.add("lang_active")
+  document.body.classList.add("skeleton");
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = ""; // clear text to prevent showing wrong language during loading
+  });
+  document.getElementById('sidebar').querySelector('ul').replaceChildren(); // clear table of contents
+  document.querySelectorAll(".hidden").forEach(el => el.classList.remove("hidden")); // unhide any elements hidden by delete tokens
+
   const url = `./Languages/${version}/${lang}.yaml`;
   const data = await fetchYaml(url);
-  console.log(data);
 
   window.i18n = data;
 
   let tokenErrors = 0;
   document.querySelectorAll("[data-i18n]").forEach(el => {
+    
     const path = el.dataset.i18n;
     const sectionKey = path.split(".").slice(0, -1).reduce((o, k) => o?.[k], i18n);
     const value = resolveKey(path, i18n);
 
     if (value === undefined || value === null) {
       console.warn(`[i18n] Missing key "${path}" in "${lang}.yaml"`);
+      // el.classList.add('hidden');
       tokenErrors++;
       return;
     }
@@ -262,17 +437,43 @@ async function loadLang(version, lang) {
 
   document.body.classList.remove("skeleton");
 
-  document.querySelectorAll('a[href^="#"]').forEach(link => {
-    if (link.dataset.triggerGlowListener) return;
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'copy-link-btn';
+  copyBtn.title = 'Copy link';
+  img = `<img src="image/assets/link2.svg" alt="Copy link" style="width:16px;height:16px;">`
+  img_check = `<img src="image/assets/check-mark.svg" alt="Link copied" style="width:16px;height:16px;">`
+  copyBtn.innerHTML = img;
+  copyBtn.style.marginLeft = '6px';
+  copyBtn.style.cursor = 'pointer';
 
-    link.addEventListener('click', triggerGlow);
-    link.dataset.triggerGlowListener = "1";
-  });
+  const tableOfContents = document.getElementById('sidebar').querySelector('ul');
+  const tableOfContentsObj = data['table_of_contents'];
+
+  for (const [key, value] of Object.entries(tableOfContentsObj)) {
+    const link = document.createElement('a');
+    const li = document.createElement('li');
+    link.href = `#${key}`;
+    link.textContent = value;
+    link.classList.add('sidebar-link');
+    li.appendChild(link);
+    li.appendChild(copyBtn.cloneNode(true));
+    for (const [cls, list] of Object.entries(liClassTolinksMap)) {
+      if (list.includes(key)) {
+        li.classList.add(cls);
+        break;
+      }
+    }
+    tableOfContents.appendChild(li);
+  }
+
+  // For highlightCurrentSection()
+  tocLinks = document.querySelectorAll('#sidebar a');
 
   mappingTable = {
     "environment-table": "environment",
     "block-table": "blocks",
     "item-table": "items",
+    "liquid-table": "liquids",
     "unit-table": "units",
     "id-block-table": "blocks",
     "id-unit-table": "units",
@@ -283,7 +484,8 @@ async function loadLang(version, lang) {
   for (const [tableId, name] of Object.entries(mappingTable)) {
     tableElement = document.getElementById(tableId);
     if (tableElement){
-      const url = `./Languages/static/${name}.yaml`;
+      tableElement.replaceChildren(); // clear existing content
+      const url = `./Languages/${version}/static/${name}.yaml`;
       const data = await fetchYaml(url);
       let isId = false;
       if (tableId.split('-')[0] == 'id') {
@@ -304,23 +506,6 @@ async function loadLang(version, lang) {
   }
 
 }
-
-// Load default language (English)
-loadLang("v7", "en").then(() => {
-  // Optional operations needed to be done after loading
-  let img = document.querySelector('img[src="image/ui1.png"]');
-  let elementsToWrap = []
-  for (let i = 0; i < 48; i++) {
-    img = img.nextSibling;
-    elementsToWrap.push(img);
-  }
-
-  section = document.createElement('section');
-  section.id = 'vars-tab'
-  elementsToWrap[0].parentNode.insertBefore(section, elementsToWrap[0]);
-  elementsToWrap.forEach(el => section.appendChild(el));
-
-});
 
 function parseTranspilerDataJSON() {
   fetch('./TranspilerData/transpiler-datas.json')
@@ -356,32 +541,32 @@ function parseTranspilerDataJSON() {
   .catch(err => console.error('fetch error:', err));
 }
 
-document.getElementById('hamburger-menu').addEventListener('click', function() {
-    var sidebar = document.getElementById('sidebar');
-    var content = document.querySelector('.main-content');
+// document.getElementById('hamburger-menu').addEventListener('click', function() {
+//     var sidebar = document.getElementById('sidebar');
+//     var content = document.querySelector('.main-content');
     
-    if (sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-        content.classList.remove('open');
-    } else {
-        sidebar.classList.add('open');
-        content.classList.add('open');
-    }
+//     if (sidebar.classList.contains('open')) {
+//         sidebar.classList.remove('open');
+//         content.classList.remove('open');
+//     } else {
+//         sidebar.classList.add('open');
+//         content.classList.add('open');
+//     }
     
-}); 
+// }); 
 
-document.getElementById('hamburger-menu-right').addEventListener('click', function() {
-  var sidebar = document.getElementById('sidebar-right');
-  var hamburgermenu = document.getElementById('hamburger-menu-right')
-  if (sidebar.classList.contains('open')) {
-      sidebar.classList.remove('open');
-      hamburgermenu.classList.remove('open');
-  } else {
-      sidebar.classList.add('open');
-      hamburgermenu.classList.add('open');
-  }
+// document.getElementById('hamburger-menu-right').addEventListener('click', function() {
+//   var sidebar = document.getElementById('sidebar-right');
+//   var hamburgermenu = document.getElementById('hamburger-menu-right')
+//   if (sidebar.classList.contains('open')) {
+//       sidebar.classList.remove('open');
+//       hamburgermenu.classList.remove('open');
+//   } else {
+//       sidebar.classList.add('open');
+//       hamburgermenu.classList.add('open');
+//   }
   
-}); 
+// }); 
 
 
 document.querySelectorAll('.sidebar-link').forEach(function(link) {
@@ -410,12 +595,11 @@ document.querySelectorAll('img').forEach(img => {
 });
 
 
+let tocLinks = document.querySelectorAll('#sidebar a');
 
 document.addEventListener('DOMContentLoaded', function() {
     parseTranspilerDataJSON();
 
-    const tocLinks = document.querySelectorAll('#sidebar a');
-  
     function highlightCurrentSection() {
       const centerX = window.innerWidth / 1.5;
       let centerY = window.innerHeight / 2;
@@ -451,47 +635,62 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
     }
+
+    // Language selection dropdown
     langButton = document.querySelector('.language-selection-button');
-    langButton.addEventListener('click', function() {
-      console.log('asdfjhasdkfj')
-      const langSelection = document.querySelector('.language-selection');
-      if (langSelection.style.display === 'block') {
-        langSelection.style.display = 'none';
-      } else {
-        langSelection.style.display = 'block';
+    langButton.addEventListener('click', function(e) {
+      if (e.target.classList.contains('lang-item') || e.target.classList.contains('language-selection-button')) {
+        const langSelection = document.querySelector('.language-selection');
+        if (langSelection.style.display === 'block') {
+          langSelection.style.display = 'none';
+        } else {
+          langSelection.style.display = 'block';
+        }
       }
     });
   
     window.addEventListener('scroll', highlightCurrentSection);
-  
     highlightCurrentSection();
 
-    all_sidebar_links = document.querySelectorAll('.sidebar-link')
-    all_sidebar_links.forEach(link => {
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'copy-link-btn';
-      copyBtn.title = 'Copy link';
-      img = `<img src="image/assets/link2.svg" alt="Copy link" style="width:16px;height:16px;">`
-      img_check = `<img src="image/assets/check-mark.svg" alt="Link copied" style="width:16px;height:16px;">`
-      copyBtn.innerHTML = img;
-      copyBtn.style.marginLeft = '6px';
-      copyBtn.style.cursor = 'pointer';
+    const tableOfContent = document.getElementById('sidebar').querySelector('ul');
 
-      copyBtn.addEventListener('click', function(e) {
+    tableOfContent.addEventListener('click', e => {
+      const btn = e.target.closest('.copy-link-btn');
+
+      if (btn) {
         e.stopPropagation();
         e.preventDefault();
-        const url = window.location.origin + window.location.pathname + link.getAttribute('href');
+
+        const link = btn.closest('li').querySelector('a');
+        const url = location.origin + location.pathname + link.getAttribute('href');
+
         navigator.clipboard.writeText(url).then(() => {
-          copyBtn.innerHTML = img_check;
-          setTimeout(() => copyBtn.innerHTML = img, 1200);
+          btn.innerHTML = img_check;
+          setTimeout(() => btn.innerHTML = img, 1200);
         });
-      });
 
-      if (!link.nextSibling || !link.nextSibling.classList || !link.nextSibling.classList.contains('copy-link-btn')) {
-        link.parentNode.insertBefore(copyBtn, link.nextSibling);
+        return;
       }
-    })
 
+      const link = e.target.closest('a[href^="#"]');
+      if (link) {
+        triggerGlow.call(link, e);
+        const swidth = window.innerWidth;
+        console.log(swidth)
+        if (swidth <= 1670) {
+          var sidebar = document.getElementById('sidebar-right');
+          if (sidebar.classList.contains('open')) {
+              sidebar.classList.remove('open');
+          }
+          sidebar = document.getElementById('sidebar');
+          if (sidebar.classList.contains('open')) {
+              sidebar.classList.remove('open');
+          }
+        }
+      }
+    });
+
+  // Load available languages and populate the language selection dropdown
   fetch('/MlogDocs/Languages/index.json')
     .then(r => r.json())
     .then(list => {
@@ -502,14 +701,61 @@ document.addEventListener('DOMContentLoaded', function() {
         langList.appendChild(versionLi);
         for (const { lang_code, language } of langs) {
           const div = document.createElement('div');
-          div.innerHTML = `<a href="#" class="indent1" onclick="loadLang('${version}', '${lang_code}')">${language}</a>`;
+          div.classList.add('lang-list-container')
+          div.innerHTML = `<a href="#" class="indent1 lang-item" id="${version}_${lang_code}" onclick="loadLang('${version}', '${lang_code}')">${language}</a>`;
           versionLi.appendChild(div);
         }
       }
       // const div = document.createElement('div');
       // div.innerHTML = `<a href="https://github.com/Yrueii/Yrueii.github.io">Contribute a translation!</a>`;
       // langList.appendChild(div);
+
+      // Load default language (v7 English)
+      loadLang("v7", "en").then(() => {
+      // loadLang("v8", "en").then(() => {
+        // Optional operations needed to be done after loading
+        let img = document.querySelector('img[src="image/ui1.png"]');
+        let elementsToWrap = []
+        for (let i = 0; i < 48; i++) {
+          img = img.nextSibling;
+          elementsToWrap.push(img);
+        }
+    
+        section = document.createElement('section');
+        section.id = 'vars-tab'
+        elementsToWrap[0].parentNode.insertBefore(section, elementsToWrap[0]);
+        elementsToWrap.forEach(el => section.appendChild(el));
+      });
     });
+
+  document.querySelector('#sidebar-pull-tab-left').addEventListener('click', function() {
+      var sidebar = document.getElementById('sidebar');
+      var content = document.querySelector('.main-content');
+      
+      if (sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+          content.classList.remove('open');
+      } else {
+          sidebar.classList.add('open');
+          content.classList.add('open');
+      }
+      
+  }); 
+
+document.querySelector('#sidebar-pull-tab-right').addEventListener('click', function() {
+  var sidebar = document.getElementById('sidebar-right');
+  // var hamburgermenu = document.getElementById('hamburger-menu-right')
+  if (sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+      // hamburgermenu.classList.remove('open');
+  } else {
+      sidebar.classList.add('open');
+      // hamburgermenu.classList.add('open');
+  }
+  
+}); 
+
+
 });
   
 function triggerGlow(event) {

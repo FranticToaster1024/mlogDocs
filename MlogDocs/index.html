@@ -35,140 +35,67 @@
 
     <div class="container">
         <aside class="sidebar" id="sidebar">
-            <ul>
+            <div class="sidebar-pull-tab" id="sidebar-pull-tab-left">
+                <svg width="100%" viewBox="445 18 55 84" xmlns="http://www.w3.org/2000/svg" role="img">
+                    <path
+                        d="M445 20
+                            Q445 40 460 40
+                            L470 40
+                            A10 10 0 0 1 470 80
+                            L460 80
+                            Q445 80 445 100
+                            Z"
+                        fill="var(--sidebar-bg-color)"
+                        stroke="var(--sidebar-border-color)"
+                        stroke-width="1"
+                    />
+                </svg>
+                <div>&#9776;</div>
+            </div>
+            <div class="toc">
                 <h2>Table of Contents</h2>
-                <li class="sub-title">
-                    <a href="#foreword" class="sidebar-link">   
-                        <div class="text-line-container"> <!-- This is a line after text effect -->
-                            <span class="text-line">Foreword</span> <!-- unused because idk if it looks good -->
-                            <span class="line"></span>
-                        </div>
-                    </a>
-                </li>
-                <li class="sub-title"><a href="#introduction" class="sidebar-link">Introduction</a></li>
-                <li class="sub-title"><a href="#glossary" class="sidebar-link">Glossary</a></li>
-                <li class="indent1"><a href="#integers" class="sidebar-link">Integers</a></li>
-                <li class="indent1"><a href="#float" class="sidebar-link">Float</a></li>
-                <li class="indent1"><a href="#boolean" class="sidebar-link">Boolean</a></li>
-                <li class="indent1"><a href="#strings" class="sidebar-link">Strings</a></li>
-                <li class="indent1"><a href="#building-reference" class="sidebar-link">Block or Unit Reference</a></li>
-                <li class="indent1"><a href="#contentname" class="sidebar-link">Content name</a></li>
-                <li class="sub-title"><a href="#basic-concept" class="sidebar-link">Basic Concept</a></li>
-                <li class="indent1"><a href="#processors" class="sidebar-link">Processors</a></li>
-                <li class="indent1"><a href="#processors-ui" class="sidebar-link">Processor's UI</a></li>
-                <li class="indent1"><a href="#how-processor-run-its-code" class="sidebar-link">How Processors run its code</a></li>
-                <li class="indent1"><a href="#links" class="sidebar-link">Links</a></li>
-                <li class="indent1"><a href="#variables" class="sidebar-link">Variables</a></li>
-                <li class="indent1"><a href="#built-in-variables" class="sidebar-link">Built in Variables</a></li>
-                <li class="indent1"><a href="#constants" class="sidebar-link">Constant</a></li>
-                <li class="indent1"><a href="#buffers" class="sidebar-link">Buffers</a></li>
-                <li class="sub-title"><a href="#blocks" class="sidebar-link">Blocks</a></li>
-                <li class="indent1"><a href="#message" class="sidebar-link">Message</a></li>
-                <li class="indent1"><a href="#switch" class="sidebar-link">Switch</a></li>
-                <li class="indent1"><a href="#display" class="sidebar-link">Displays</a></li>
-                <li class="indent1"><a href="#cell" class="sidebar-link">Cells/Banks</a></li>
-                <li class="sub-title"><a href="#instructions" class="sidebar-link">Instructions</a></li>
-                <li class="indent1"><a href="#read" class="sidebar-link">Read</a></li>
-                <li class="indent1"><a href="#write" class="sidebar-link">Write</a></li>
-                <li class="indent1"><a href="#draw" class="sidebar-link">Draw</a></li>
-                <li class="indent1"><a href="#draw-flush" class="sidebar-link">Draw Flush</a></li>
-                <li class="indent1"><a href="#print" class="sidebar-link">Print</a></li>
-                <li class="indent1"><a href="#print-flush" class="sidebar-link">Print Flush</a></li>
-                <li class="indent1"><a href="#get-link" class="sidebar-link">Get link</a></li>
-                <li class="indent1"><a href="#control" class="sidebar-link">Control</a></li>
-                <li class="indent1"><a href="#radar" class="sidebar-link">Radar</a></li>
-                <li class="indent1"><a href="#sensor" class="sidebar-link">Sensor</a></li>
-                <li class="indent1"><a href="#set" class="sidebar-link">Set</a></li>
-                <li class="indent1"><a href="#operation" class="sidebar-link">Operation</a></li>
-                <li class="indent1"><a href="#lookup" class="sidebar-link">Lookup</a></li>
-                <li class="indent1"><a href="#pack-color" class="sidebar-link">Pack Color</a></li>
-                <li class="indent1"><a href="#wait" class="sidebar-link">Wait</a></li>
-                <li class="indent1"><a href="#stop" class="sidebar-link">Stop</a></li>
-                <li class="indent1"><a href="#end" class="sidebar-link">End</a></li>
-                <li class="indent1"><a href="#jump" class="sidebar-link">Jump</a></li>
-                <li class="sub-title"><a href="#controlling-units" class="sidebar-link">Controlling Units</a></li>
-                <li class="indent1"><a href="#unit-bind" class="sidebar-link">Unit Bind</a></li>
-                <li class="indent1"><a href="#unit-control" class="sidebar-link">Unit Control</a></li>
-                <li class="indent1"><a href="#unit-radar" class="sidebar-link">Unit Radar</a></li>
-                <li class="indent1"><a href="#unit-locate" class="sidebar-link">Unit Locate</a></li>
-                <li class="sub-title"><a href="#simple-logic-examples" class="sidebar-link">Simple Logic Examples</a></li>
-                <li class="indent1"><a href="#universal-switch" class="sidebar-link">Universal Switch</a></li>
-                <li class="indent1"><a href="#shuttle-logic" class="sidebar-link">Shuttle Logic</a></li>
-                <li class="indent1"><a href="#thorium-reactor-fail-safe" class="sidebar-link">Thorium Reactor Fail Safe</a></li>
-                <li class="indent1"><a href="#counter-array" class="sidebar-link">@counter Array</a></li>
-                <li class="sub-title"><a href="#advanced" class="sidebar-link">Advanced</a></li>
-                <li class="indent1"><a href="#writing-in-text-editor" class="sidebar-link">Writing in text editor</a></li>
-                <li class="indent1"><a href="#transpiler" class="sidebar-link">Transpiler</a></li>
-                <li class="indent1"><a href="#mods" class="sidebar-link">Mods</a></li>
-                <li class="indent1"><a href="#subframe" class="sidebar-link">Antithreading / Subframe</a></li>
-                <li class="sub-title"><a href="#world-logic" class="sidebar-link">World Logic (WIP)</a></li>
-                <li class="indent1"><a href="#how-to-get-world-processor" class="sidebar-link">How to get World Processor</a></li>
-                <li class="indent1"><a href="#get-block" class="sidebar-link">Get Block</a></li>
-                <li class="indent1"><a href="#set-block" class="sidebar-link">Set Block</a></li>
-                <li class="indent1"><a href="#spawn-unit" class="sidebar-link">Spawn Unit</a></li>
-                <li class="indent1"><a href="#apply-status" class="sidebar-link">Apply Status</a></li>
-                <li class="indent1"><a href="#spawn-wave" class="sidebar-link">Spawn Wave(WIP)</a></li>
-                <li class="indent1"><a href="#set-rule" class="sidebar-link">Set Rule(WIP)</a></li>
-                <li class="indent1"><a href="#flush-message" class="sidebar-link">Flush Message</a></li>
-                <li class="indent1"><a href="#cutscene" class="sidebar-link">Cutscene</a></li>
-                <li class="indent1"><a href="#effect" class="sidebar-link">Effect</a></li>
-                <li class="indent1"><a href="#explosion" class="sidebar-link">Explosion</a></li>
-                <li class="indent1"><a href="#set-rate" class="sidebar-link">Set Rate</a></li>
-                <li class="indent1"><a href="#fetch" class="sidebar-link">Fetch</a></li>
-                <li class="indent1"><a href="#sync" class="sidebar-link">Sync(WIP)</a></li>
-                <li class="indent1"><a href="#get-flag" class="sidebar-link">Get Flag</a></li>
-                <li class="indent1"><a href="#set-flag" class="sidebar-link">Set Flag</a></li>
-                <li class="indent1"><a href="#set-prop" class="sidebar-link">Set Prop</a></li>
-                <li class="sub-title"><a href="#bleeding-edge" class="sidebar-link">Bleeding Edge(WIP)</a></li>
-                <li class="sub-title"><a href="#extras" class="sidebar-link">Extras</a></li>
-                <li class="indent1"><a href="#mindustry-coordinate-system" class="sidebar-link">Mindustry Coordinate System</a></li>
-                <li class="indent1"><a href="#configure-turns-to-config" class="sidebar-link">The word <span style="color: cyan; font-style: italic;">configure</span> turns to <span style="color: cyan; font-style: italic;">config</span></a></li>
-                <li class="indent1"><a href="#you-cannot-spawn-scathe-missile" class="sidebar-link">You cannot spawn Scathe missles</a></li>
-                <li class="indent1"><a href="#modded-items-and-draw-image" class="sidebar-link">Modded items and Draw Image</a></li>
-                <li class="indent1"><a href="#ai-chatbot-doenst-understand-mlog" class="sidebar-link">AI Chatbot doesn't understand Mlog</a></li>
-                <li class="indent1"><a href="#getting-unit-cap" class="sidebar-link">Getting unit cap</a></li>
-                <li class="indent1"><a href="#v6-unit-control-with-logic" class="sidebar-link">v6 unit control with logic</a></li>
-                <li class="indent1"><a href="#damage-calculation" class="sidebar-link">Damage calculation   </a></li>
-                <li class="indent1"><a href="#math" class="sidebar-link">Math</a></li>
-                <li class="indent1"><a href="#self-linking-processor" class="sidebar-link">Self linking processor</a></li>
-                <li class="sub-title"><a href="#self-promotion" class="sidebar-link">Self promotion</a></li>
-                <li class="sub-title"><a href="#appendix" class="sidebar-link">Appendix</a></li>
-                <li class="indent1"><a href="#mloginvention" class="sidebar-link">Mlog Invention</a></li>
-                <li class="indent1"><a href="#built-in-variables1" class="sidebar-link">Built in Variables</a></li>
-                <li class="indent2"><a href="#global" class="sidebar-link">Global</a></li>
-                <li class="indent2"><a href="#environment" class="sidebar-link">Environment</a></li>
-                <li class="indent2"><a href="#sensors" class="sidebar-link">Sensors</a></li>
-                <li class="indent2"><a href="#blocks-and-items" class="sidebar-link">Blocks and Items</a></li>
-                <li class="indent2"><a href="#units" class="sidebar-link">Units</a></li>
-                <li class="indent1"><a href="#text-form-instruction" class="sidebar-link">Text form instruction</a></li>
-                <li class="indent2"><a href="#normal-processor" class="sidebar-link">Normal Processor</a></li>
-                <li class="indent2"><a href="#world-processor" class="sidebar-link">World Processor</a></li>
-                <li class="indent1"><a href="#lookup-ids" class="sidebar-link">Lookup Id(s)</a></li>
-                <li class="indent1"><a href="#dblockbehaviour" class="sidebar-link">Disabled block behaviour</a></li>
-                <li class="sub-title"><a href="#Contributors" class="sidebar-link">Contributors</a></li>
-                <li class="indent1"><a href="#" class="sidebar-link"></a>.</li>
-                <li class="indent1"><a href="#" class="sidebar-link"></a>.</li>
-            </ul>
+                <ul>
+                </ul>
+            </div>
         </aside>
         <aside class="sidebar-right" id="sidebar-right">
-            <ul>
-                <h2>Links</h2>
-                <li><a href="MlogInvention/index.html">Mlog Invention</a></li>
-                <li><a href="MlogLabeler/index.html">Mlog Labeler</a></li>
-                <li><a href="ProcessorUI/index.html">Online Processor GUI</a></li>
-            </ul>
+            <div class="sidebar-pull-tab" id="sidebar-pull-tab-right">
+                <svg width="100%" viewBox="445 18 55 84" xmlns="http://www.w3.org/2000/svg" role="img">
+                    <path
+                        d="M445 20
+                            Q445 40 460 40
+                            L470 40
+                            A10 10 0 0 1 470 80
+                            L460 80
+                            Q445 80 445 100
+                            Z"
+                        fill="var(--sidebar-bg-color)"
+                        stroke="var(--sidebar-border-color)"
+                        stroke-width="1"
+                    />
+                </svg>
+                <div>&#9776;</div>
+            </div>
+            <div class="side-links">
+                <ul>
+                    <h2>Links</h2>
+                    <li><a href="MlogInvention/index.html">Mlog Invention</a></li>
+                    <li><a href="MlogLabeler/index.html">Mlog Labeler</a></li>
+                    <li><a href="ProcessorUI/index.html">Online Processor GUI</a></li>
+                </ul>
+            </div>
             <br>
         </aside>
         <main class="main-content" style="font-size: larger;">
-            <div class="hamburger-menu" id="hamburger-menu">
+            <!-- <div class="hamburger-menu" id="hamburger-menu">
                 &#9776;
-            </div>
-            <div class="hamburger-menu-right" id="hamburger-menu-right">
+            </div> -->
+            <!-- <div class="hamburger-menu-right" id="hamburger-menu-right">
                 &#9776;
-            </div>
+            </div> -->
             <div class="main-title">
                 <div class="language-selection-button">
-                    <img data-listener-exclude="1" src="./Languages/static/language.svg" alt="">Languages
+                    <img data-listener-exclude="1" src="./image/language.svg" alt="">Languages
                     <div class="language-selection">
                         <div class="lang-header">
                             <div>Versions and Languages</div>
@@ -178,7 +105,7 @@
                             </div>
                         </div>
                         <div class="lang-footer">
-                            <a href="https://github.com/Yrueii/Yrueii.github.io">Contribute a translation!</a>
+                            <a target="_blank" href="https://github.com/Yrueii/Yrueii.github.io">Contribute a translation!</a>
                         </div>
                     </div>
                 </div>
@@ -378,6 +305,8 @@
                                 <p class="ti" data-i18n="instructions.draw.linepoly.content"></p>
                             <li><b data-i18n="instructions.draw.triangle.title"></b></li>
                                 <p class="ti" data-i18n="instructions.draw.triangle.content"></p>
+                            <li><b data-i18n="instructions.draw.print.title"></b></li>
+                                <p class="ti" data-i18n="instructions.draw.print.content"></p>
                             <li><b data-i18n="instructions.draw.image.title"></b></li>
                                 <p class="ti" data-i18n="instructions.draw.image.content"></p>
                         </ol>
@@ -394,6 +323,8 @@
                             <p class="ti" data-i18n="instructions.print.list.linebreak.content"></p>
                             <li data-i18n="instructions.print.list.colors.title"></li>
                             <p class="ti" data-i18n="instructions.print.list.colors.content"></p>
+                            <li data-i18n="instructions.print.list.format.title"></li>
+                            <p class="ti" data-i18n="instructions.print.list.format.content"></p>
                             <li><b data-i18n="instructions.print.list.emoji.title"></b></li>
                             <p class="ti" data-i18n="instructions.print.list.emoji.content"></p>
                         </ol>
@@ -810,8 +741,8 @@
                         </section>
                         <section id="explosion">
                             <li><h2 data-i18n="world_logic.explosion.title"></li></h2>
-                            <img alt="alt" src="image/explosion.png" style="max-width: 85vw !important;">
-                            <p data-i18n="world_logic.explosion.content"></p>
+                            <span data-i18n="world_logic.explosion.content"></span>
+                            <span data-i18n="world_logic.explosion.content2" class="spin"></span>
                         </section>
                         <section id="set-rate">
                             <li><h2 data-i18n="world_logic.set_rate.title"></li></h2>
@@ -841,8 +772,47 @@
                         </section>
                         <section id="set-prop">
                             <li><h2 data-i18n="world_logic.set_prop.title"></li></h2>
-                            <img alt="alt" src="image/set prop.png" style="max-width: 85vw !important;">
                             <p data-i18n="world_logic.set_prop.content"></p>
+                            <span data-i18n="world_logic.set_prop.list.x.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.x.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.y.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.y.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.velocityx.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.velocityx.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.velocityy.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.velocityy.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.rotation.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.rotation.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.speed.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.speed.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.armor.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.armor.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.health.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.health.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.shield.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.shield.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.team.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.team.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.flag.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.flag.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.totalpower.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.totalpower.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.payloadtype.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.payloadtype.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.bullettime.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.bullettime.content" class="spin mb0"></span>
+                            <span data-i18n="world_logic.set_prop.list.bulletlifetime.title"></span>
+                            <span data-i18n="world_logic.set_prop.list.bulletlifetime.content" class="spin mb0"></span>
+                        </section>
+                        <section id="make-marker">
+                            <li><h2 data-i18n="world_logic.make_marker.title"></li></h2>
+                            <!-- <img alt="alt" src="image/make marker.png" style="max-width: 85vw !important;"> -->
+                            <p data-i18n="world_logic.make_marker.content"></p>
+                        </section>
+                        <section id="set-marker">
+                            <li><h2 data-i18n="world_logic.set_marker.title"></li></h2>
+                            <!-- <img alt="alt" src="image/set marker.png" style="max-width: 85vw !important;"> -->
+                            <p data-i18n="world_logic.set_marker.content"></p>
                         </section>
                     </ol>
 
@@ -1212,6 +1182,15 @@
                         <div data-i18n="built_in_vars2.sensors.shootX.content" class="spin" style="margin-bottom: 1rem;"></div>
                     <div data-i18n="built_in_vars2.sensors.shootY.title"></div>
                         <div data-i18n="built_in_vars2.sensors.shootY.content" class="spin" style="margin-bottom: 1rem;"></div>
+                    <div data-i18n="built_in_vars2.sensors.cameraX.title"></div>
+                        <div data-i18n="built_in_vars2.sensors.cameraX.content" class="spin" style="margin-bottom: 1rem;"></div>
+                    <div data-i18n="built_in_vars2.sensors.cameraY.title"></div>
+                        <div data-i18n="built_in_vars2.sensors.cameraY.content" class="spin" style="margin-bottom: 1rem;"></div>
+                        <div data-i18n="built_in_vars2.sensors.shootY.content" class="spin" style="margin-bottom: 1rem;"></div>
+                    <div data-i18n="built_in_vars2.sensors.cameraWidth.title"></div>
+                        <div data-i18n="built_in_vars2.sensors.cameraWidth.content" class="spin" style="margin-bottom: 1rem;"></div>
+                    <div data-i18n="built_in_vars2.sensors.cameraHeight.title"></div>
+                        <div data-i18n="built_in_vars2.sensors.cameraHeight.content" class="spin" style="margin-bottom: 1rem;"></div>
                     <div data-i18n="built_in_vars2.sensors.size.title"></div>
                         <div data-i18n="built_in_vars2.sensors.size.content" class="spin" style="margin-bottom: 1rem;"></div>
                     <div data-i18n="built_in_vars2.sensors.dead.title"></div>
@@ -1261,6 +1240,8 @@
                     <div id="block-table" class="content-table"></div>
                     <h2>Items</h2>
                     <div id="item-table" class="content-table"></div>
+                    <h2>Liquids</h2>
+                    <div id="liquid-table" class="content-table"></div>
                 </section>
                 <section id="units">
                     <h2>Units</h2>

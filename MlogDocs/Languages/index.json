@@ -1,10 +1,10 @@
 {
     "v7":
     [   
-        {"language": "English", "lang_code": "en"}
+        {"language": "English (Default)", "lang_code": "en"}
     ],
     "v8":
     [
-        {"language": "-", "lang_code": "-"}
+        {"language": "English (WIP)", "lang_code": "en"}
     ]
 }

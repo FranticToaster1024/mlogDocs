@@ -1,5 +1,7 @@
 ## Translation Contribution
-1. Create a new YAML file in the `Languages/i18n/` directory named after the language code (e.g., `fr.yaml` for French)
+(v8 are currently in progress, its better to not translate this yet as the english structure might change)
+
+1. Create a new YAML file in the `Languages/v7/` or `Languages/v8/` directory named after the language code (e.g., `fr.yaml` for French)
 2. Copy the structure from the English translation file (`en.yaml`)
 3. Update `index.yaml` to include an entry with:
     - `lang_code`: the file name without extension
@@ -82,5 +84,14 @@ variable = apply mindustry font, black background, light blue text
                           Image token doesn't need a key
                           link will be directly taken from :link:
 <img src="{link}" class={class}>
+
+{raw:<tag>}             > Insert raw HTML element
+
+{delete:0:0}            > Deletes element
+                          the first number indicates how many levels up the element to delete, default 0 means delete the element itself
+                          the second number indicates how many siblings to also delete, default 0 means only delete the element itself
+{delete:0:3 cascade}    > Deletes element and 3 next siblings, cascade means deletes in-between siblings as well
+{delete:0:-3 cascade}   > Deletes element and 3 previous siblings, cascade means deletes in-between siblings as well
+The delete token should be ignored when translating normally, this token is purely for restructuring the document on version changes
 
 ```
