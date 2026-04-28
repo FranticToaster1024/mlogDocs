@@ -149,15 +149,19 @@ foreword:
         {br} Reddit ({link:redditlink:https://www.reddit.com/user/Far_Kale588/}) 
         {br} or make an issue {link:linkhere:https://github.com/Yrueii/Yrueii.github.io/issues}
         {br}
-        {br} if you have any question about mlog, whether it is technical help or general question feel free to ask them in 
-        {br} {link:discordlink:https://discord.gg/mindustry} 
-        people there will be happy to help you, (just dont ask to ask, just ask) 
+        {br} if you have any question about mlog, whether it is technical help or general question feel free to ask them on
+        {br} {link:discordlink:https://discord.gg/mindustry} in the #logic channel (I'm also here regularly)
+        {br} there will be plenty of people that can help you.
         {br}
         {br} There are some missing information in this documentation, which are identified by {code:toadd:yel}, 
         {br} for people who want to contribute and complete them you can search for it by pressing 
         {code:ctrl:key} + {code:f:key}, or {code:findinpage:yel} for mobile devices
+        {br}
+        {br}{raw:<span style="color: yellow;">Regarding v8:</span>}
+        {br}There's a language button on the top left corner to switch between v7 and v8 documentation, currently by default this page is v7, as v8 is still in progress, but you can still change to v8 if you want. 
+        {br}As v8 just become official recently, it will take some time to fully update the documentation, but I will try to update it as soon as possible. If you want to help with the v8 documentation please don't hesitate to contact me, it can be just a curation of information to a pull request, anything that can make the process faster is appreciated. Thanks in advance!
     redditlink: u/Far_Kale558
-    discordlink: https://discord.gg/mindustry
+    discordlink: Official Mindustry Discord 
     toadd: "TO ADD#"
     ctrl: CTRL
     linkhere: Here

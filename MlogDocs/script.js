@@ -4,7 +4,7 @@
 function renderTextWithTokens(el, text, sectionData, _debugPath) {
   const frag = document.createDocumentFragment();
   const regex = /(?<!\\)\{(\w+)(?::([^:}]+)(?::([^}]+))?)?\}/g;
-  const pureregex = /(?<!\\)\{pure:([^}]+)\}/g;
+  const rawregex = /(?<!\\)\{raw:([^}]+)\}/g;
 
   let last = 0;
   let m;
@@ -12,12 +12,12 @@ function renderTextWithTokens(el, text, sectionData, _debugPath) {
   while ((m = regex.exec(text))) {
     frag.append(text.slice(last, m.index).replace(/\\([{}])/g, '$1'));
     let [fullMatch, type, name, extra] = m;
-    if (type === 'pure') {
-      const pureMatch = pureregex.exec(fullMatch);
-      if (pureMatch) {
-        fullMatch = pureMatch[0];
-        name = pureMatch[1];
-        type = 'pure';
+    if (type === 'raw') {
+      const rawMatch = rawregex.exec(fullMatch);
+      if (rawMatch) {
+        fullMatch = rawMatch[0];
+        name = rawMatch[1];
+        type = 'raw';
       };
     }
     const tokenPos = m.index;
