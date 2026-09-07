@@ -493,6 +493,10 @@ section {
     margin-bottom: 40px;
 }
 
+.section-inline {
+    margin-bottom: 0px;
+}
+
 .subtitle {
     margin-bottom: 80px;
 }
@@ -794,7 +798,8 @@ section {
 .draw:not(.variable) a,
 .control:not(.variable) a,
 .wp:not(.variable) a,
-.variable a {
+.variable a,
+.content-name a { 
     all: unset;
     padding-bottom: 0.3em;
     cursor: pointer;

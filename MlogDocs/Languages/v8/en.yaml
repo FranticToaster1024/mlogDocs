@@ -340,7 +340,7 @@ table_of_contents:
         mloginvention:
             title: Mlog Invention
             class: indent1
-        built-in-variables1:
+        built-in-variables-full:
             title: Built in Variables
             class: indent1
         global:
@@ -2000,7 +2000,7 @@ logic_examples:
                 {br}Line 1 : Set {code:i:variable op} to 0, this is your index variable to access the Array
                 {br}Line 2 : By using lookup we get a content name from the index variable
                 {br}Line 3 : We increment our index.
-                {br}Line 4 : We get the string equivalent of the content name that we get previously from lookup, because in order to read variables from processors using the {code:read:draw} instruction, the {code:at:field} field value must a string, and sensoring {code:_name:content-name} from a content name gives us a string. This will become our array key.
+                {br}Line 4 : We get the string equivalent of the content name that we get previously from lookup, because in order to read variables from processors using the {code:read:draw} instruction, the {code:at:field} field value must a string, and sensoring {code:name:content-name} from a content name gives us a string. This will become our array key.
                 {br}Line 5 : Write a value to the array on index {code:i:variable}, this is optional, in practice you would fill this with what ever you want to store in the array, like a unit reference.
                 {br}Line 6 : Read the value from {code:this:variable} (so we don't need another processor) processor using our derived key string which is also derived from our index {code:i:variable}
                 {br}Line 7 : At this point the core part of the lookup array is done, you can use the value from the array to your needs, in this case we just print it.
@@ -2013,8 +2013,9 @@ logic_examples:
             _read: read
             i: i
             at: at
+            name: "{link:_name:#built_in_variables_full-sensors-name}"
             _name: "@name"
-            this: "{link:_this:#built-in-variable}"
+            this: "{link:_this:#built-in-variables}"
             _this: "@this"
             printflush: "{link:_printflush:#print-flush}"
             _printflush: printflush
@@ -3170,7 +3171,7 @@ extras:
         control_enabled_this_0: "control enabled @this 0"
         varsworldtilex_ybuildlinksaddnew_logicbl: "Vars.world.tile(x, y).build.links.add(new LogicBlock.LogicLink(x, y, \"processor1\", true))"
 
-built_in_vars2:
+built_in_variables_full:
     global:
         waveNumber: 
             title: "@waveNumber"
@@ -3526,7 +3527,7 @@ built_in_vars2:
         name:
             title: "@name"
             content: |
-                name of player, returns string
+                name of object, returns string
         payloadCount:
             title: "@payloadCount"
             content: |

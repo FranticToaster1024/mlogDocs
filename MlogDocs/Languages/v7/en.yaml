@@ -295,7 +295,7 @@ table_of_contents:
         mloginvention:
             title: Mlog Invention
             class: indent1
-        built-in-variables1:
+        built-in-variables-full:
             title: Built in Variables
             class: indent1
         global:
@@ -3052,7 +3052,7 @@ extras:
         control_enabled_this_0: "control enabled @this 0"
         varsworldtilex_ybuildlinksaddnew_logicbl: "Vars.world.tile(x, y).build.links.add(new LogicBlock.LogicLink(x, y, \"processor1\", true))"
 
-built_in_vars2:
+built_in_variables_full:
     global:
         waveNumber: 
             title: "@waveNumber"
@@ -3346,7 +3346,7 @@ built_in_vars2:
         name:
             title: "@name"
             content: |
-                name of player, returns string
+                name of object, returns string
         payloadCount:
             title: "@payloadCount"
             content: |
