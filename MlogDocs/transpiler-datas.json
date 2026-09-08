@@ -1,7 +1,7 @@
-{"date_updated": "2026-09-07 02:51:12", "repos": [
+{"date_updated": "2026-09-08 03:01:05", "repos": [
 {
   "html_url": "https://github.com/cardillan/mindcode",
-  "short_name": "Mincode",
+  "short_name": "Mindcode",
   "description": "A high level language for Mindustry Logic (mlog) and Mindustry Schematics.",
   "owner": "cardillan",
   "updated_at": "2026-09-04T17:38:02Z",
@@ -22,7 +22,7 @@
   "short_name": "Mlogls",
   "description": "A language server for the Mindustry Logic programming language",
   "owner": "JeanJPNM",
-  "updated_at": "2026-08-31T07:34:02Z",
+  "updated_at": "2026-09-07T05:12:24Z",
   "stargazers_count": 11
 }
 ,
@@ -73,7 +73,7 @@
 ,
 {
   "html_url": "https://github.com/yangfl/minasm",
-  "short_name": "MlogEvo",
+  "short_name": "MinAsm",
   "description": "Assembly-like language compiles to Mindustry Logic Language",
   "owner": "yangfl",
   "updated_at": "2026-07-28T17:43:58Z",
@@ -91,7 +91,7 @@
 ,
 {
   "html_url": "https://github.com/albi-c/mlogpp",
-  "short_name": "Mlogpp",
+  "short_name": "mlog++",
   "description": "high level mindustry logic language",
   "owner": "albi-c",
   "updated_at": "2026-04-28T09:12:04Z",
@@ -100,11 +100,11 @@
 ,
 {
   "html_url": "https://github.com/quantumsheep/glsl-mlog-compiler",
-  "short_name": "GLSL to Mlog",
+  "short_name": "GLSL to mlog compiler",
   "description": "Transpiles GLSL to mlog (Mindustry Logic)",
   "owner": "quantumsheep",
-  "updated_at": "2025-11-24T03:22:03Z",
-  "stargazers_count": 4
+  "updated_at": "2026-09-07T16:22:05Z",
+  "stargazers_count": 3
 }
 ,
 {
@@ -118,16 +118,16 @@
 ,
 {
   "html_url": "https://github.com/A4-Tacks/mindustry_logic_bang_lang",
-  "short_name": "Mlog Bang Lang",
+  "short_name": "MindustryLogicBangLang",
   "description": "Mindustry logic extension meta-programming language, for zero additional overhead!",
   "owner": "A4-Tacks",
-  "updated_at": "2026-08-28T20:14:19Z",
+  "updated_at": "2026-09-07T15:31:46Z",
   "stargazers_count": 34
 }
 ,
 {
   "html_url": "https://github.com/SkyeTheFoxyFox/sfmlog",
-  "short_name": "sfmlog",
+  "short_name": "Sfmlog",
   "description": "An mlog transpiler",
   "owner": "SkyeTheFoxyFox",
   "updated_at": "2026-09-07T00:29:44Z",
