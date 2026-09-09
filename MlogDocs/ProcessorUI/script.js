@@ -2010,10 +2010,10 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
             switch(option){
                 case 'clear':
                     // field 3 is the only field modified (by draw print)
-                    main([11,22,33,1,2,3], {3:'0',11:'r',22:'g',33:'b'})
+                    main([11,22,33,1,2,3], {11:'r',22:'g',33:'b'})
                     break;
                 case 'color':
-                    main([11,22,33,44,1,2,3,4], {3:'0',11:'r',22:'g',33:'b',44:'a'})
+                    main([11,22,33,44,1,2,3,4], {11:'r',22:'g',33:'b',44:'a'})
                     break;
                 case 'col':
                     main([11,1], {11 : 'color'})
