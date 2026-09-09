@@ -378,7 +378,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
             code = `<span class="editable world" contenteditable="true" order="2">${field2 || 'result'}</span>
                     <span>=</span>
                     <span>get</span>
-                    <span class="editable world" contenteditable="true" order="1" onclick="popUpMenu(event,'ulocateFindMenu')" oninput="selectOption(event,'ulocateFindMenu', null, null, 1)">${field1 || 'building'}</span>
+                    <span class="editable world" contenteditable="true" order="1" onclick="popUpMenu(event,'getBlockMenu')" oninput="selectOption(event,'getBlockMenu', null, null, 1)">${field1 || 'building'}</span>
                     <span>at</span>
                     <span class="editable world" contenteditable="true" order="3">${field3 || '0'}</span>
                     <span>,</span>
