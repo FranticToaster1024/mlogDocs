@@ -1804,6 +1804,18 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'unban':
                     main([11,2], {11: 'block/unit'})
                     break;
+                case 'buildSpeed':
+                case 'unitHealth':
+                case 'unitBuildSpeed':
+                case 'unitMineSpeed':
+                case 'unitCost':
+                case 'unitDamage':
+                case 'blockHealth':
+                case 'blockDamage':
+                case 'rtsMinWeight':
+                case 'rtsMinSquad':
+                    main([11,2,3], {11: 'of', 22: '='})
+                    break;
                 default:
                     main([11,2], {11: '='})
             }
