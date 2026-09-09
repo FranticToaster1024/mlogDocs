@@ -1857,6 +1857,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'explosion':
                     main([2, 3, 4, 44], {44: 'size'});
                     break;
+                default:
+                    console.error(`Unhandled effectMenu selection ${option}`);
             }
             break;
         case 'fetchMenu':
@@ -1881,6 +1883,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'buildCount':
                     main([5,55], {55: 'block'})
                     break;
+                default:
+                    console.error(`Unhandled fetchMenu selection ${option}`);
             }
             break;
         case 'controlMenu':
@@ -1896,6 +1900,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'shootp':
                     main([2, 3, 4, 33, 44], {33: 'unit', 44: 'shoot'})
                     break;
+                default:
+                    console.error(`Unhandled controlMenu selection ${option}`);
             }
             break;
         case 'setMarkerMenu':
@@ -1960,6 +1966,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'colori':
                     main([22, 2, 33, 3, 44, 4], {22: 'of id#', 33: 'index', 44: 'color'})
                     break;
+                default:
+                    console.error(`Unhandled setMarkerMenu selection ${option}`);
             }
             break;
         case 'jumpMenu':
@@ -2028,6 +2036,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'rotate':
                     main([11,1], {11:'degrees'})
                     break;
+                default:
+                    console.error(`Unhandled drawMenu selection ${option}`);
             }
             break;
         case 'ucontrolMenu':
@@ -2082,6 +2092,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'within':
                     main([11,22,33,44,1,2,3,4,5], {11:'x',22:'y',33:'radius',44:'result'})
                     break;
+                default:
+                    console.error(`Unhandled ucontrolMenu selection ${option}`);
             }
             break;
         case 'ulocateFindMenu':
@@ -2096,6 +2108,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'spawn':
                     main([-1])
                     break;
+                default:
+                    console.error(`Unhandled ulocateFindMenu selection ${option}`);
             }
             break;
         case 'setBlockMenu':
@@ -2105,6 +2119,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'block':
                     main([5,6])
                     break;
+                default:
+                    console.error(`Unhandled setBlockMenu selection ${option}`);
             }
             break;
         case 'flushMessageMenu':
@@ -2117,6 +2133,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'toast':
                     main([1,3])
                     break;
+                default:
+                    console.error(`Unhandled flushMessageMenu selection ${option}`);
             }
             break;
         case 'cutsceneMenu':
@@ -2130,6 +2148,8 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case 'stop':
                     main([1])
                     break;
+                default:
+                    console.error(`Unhandled cutsceneMenu selection ${option}`);
             }
             break;
         case 'printCharMenu':
