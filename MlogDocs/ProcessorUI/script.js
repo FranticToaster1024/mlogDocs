@@ -1989,10 +1989,11 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
         case 'drawMenu':
             switch(option){
                 case 'clear':
-                    main([11,22,33,1,2,3])
+                    // field 3 is the only field modified (by draw print)
+                    main([11,22,33,1,2,3], {3:'0',11:'r',22:'g',33:'b'})
                     break;
                 case 'color':
-                    main([11,22,33,44,1,2,3,4])
+                    main([11,22,33,44,1,2,3,4], {3:'0',11:'r',22:'g',33:'b',44:'a'})
                     break;
                 case 'col':
                     main([11,1], {11 : 'color'})
@@ -2035,6 +2036,9 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 case 'rotate':
                     main([11,1], {11:'degrees'})
+                    break;
+                case 'reset':
+                    main([-1])
                     break;
                 default:
                     console.error(`Unhandled drawMenu selection ${option}`);
