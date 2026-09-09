@@ -1818,6 +1818,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     main([11,2], {11: '='})
+                    break;
             }
             break;
         case 'effectMenu': 
@@ -1871,6 +1872,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled effectMenu selection ${option}`);
+                    break;
             }
             break;
         case 'fetchMenu':
@@ -1897,6 +1899,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled fetchMenu selection ${option}`);
+                    break;
             }
             break;
         case 'controlMenu':
@@ -1914,6 +1917,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled controlMenu selection ${option}`);
+                    break;
             }
             break;
         case 'setMarkerMenu':
@@ -1980,6 +1984,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled setMarkerMenu selection ${option}`);
+                    break;
             }
             break;
         case 'jumpMenu':
@@ -1995,6 +2000,9 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 case '>=':
                 case '===':
                     main([1,2,3,4])
+                    break;
+                default:
+                    console.error(`Unhandled jumpMenu selection ${option}`);
                     break;
             }
             break;
@@ -2054,6 +2062,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled drawMenu selection ${option}`);
+                    break;
             }
             break;
         case 'ucontrolMenu':
@@ -2110,6 +2119,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled ucontrolMenu selection ${option}`);
+                    break;
             }
             break;
         case 'ulocateFindMenu':
@@ -2126,6 +2136,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled ulocateFindMenu selection ${option}`);
+                    break;
             }
             break;
         case 'setBlockMenu':
@@ -2137,6 +2148,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled setBlockMenu selection ${option}`);
+                    break;
             }
             break;
         case 'flushMessageMenu':
@@ -2151,6 +2163,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled flushMessageMenu selection ${option}`);
+                    break;
             }
             break;
         case 'cutsceneMenu':
@@ -2166,6 +2179,7 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                     break;
                 default:
                     console.error(`Unhandled cutsceneMenu selection ${option}`);
+                    break;
             }
             break;
         case 'printCharMenu':
