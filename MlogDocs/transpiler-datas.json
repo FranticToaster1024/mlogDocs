@@ -1,4 +1,4 @@
-{"date_updated": "2026-09-15 03:21:42", "repos": [
+{"date_updated": "2026-09-16 03:17:50", "repos": [
 {
   "html_url": "https://github.com/cardillan/mindcode",
   "short_name": "Mindcode",
@@ -22,8 +22,8 @@
   "short_name": "Mlogls",
   "description": "A language server for the Mindustry Logic programming language",
   "owner": "JeanJPNM",
-  "updated_at": "2026-09-07T05:12:24Z",
-  "stargazers_count": 11
+  "updated_at": "2026-09-15T07:05:38Z",
+  "stargazers_count": 12
 }
 ,
 {
