@@ -138,7 +138,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span>=</span>
                     <span>if</span>
                     <span class="editable operation toggleableField" contenteditable="true" style="display:block;" order="3">${field3 || 'x'}</span>
-                    <span class="editable operation selectionValue" id="operation" contenteditable="true" onclick="popUpMenu(event,'jumpMenu')" oninput="selectOption(event,'jumpMenu', null, null, 1)" order="2">${field2 || 'not'}</span>
+                    <span class="editable operation selectionValue" id="operation" contenteditable="true" onclick="popUpMenu(event,'jumpMenu')" oninput="selectOption(event,'selectMenu', null, null, 1)" order="2">${field2 || 'not'}</span>
                     <span class="editable operation toggleableField" contenteditable="true" style="display:block;" order="4">${field4 || 'false'}</span>
                     <span>then</span>
                     <span class="editable operation" contenteditable="true" style="display:block;" order="5">${field5 || 'a'}</span>
