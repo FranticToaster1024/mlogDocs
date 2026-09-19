@@ -2656,8 +2656,9 @@ async function importCode(manual,codeSaved){
         type = instTypeMapR[words[0]]
         if (type){
             // console.log(type);
-            let triggerPopupMenu // @Important, this triggers the popup change fields for imports, add new types here
-            if (['Control', 
+            // @Important, this triggers the popup change fields for imports, add new types here
+            const triggerPopupMenu = [
+                'Control', 
                 'Draw', 
                 'Unit Control', 
                 'Operation',
@@ -2669,9 +2670,9 @@ async function importCode(manual,codeSaved){
                 'Effect', 
                 'Fetch',
                 'Play Sound',
-                'Set Marker'].includes(type)) {
-                triggerPopupMenu = true
-            }
+                'Set Marker'
+            ].includes(type);
+
 
             const inst = addInstruction(type, 0, ...words.slice(1,13), triggerPopupMenu);
             if (triggerPopupMenu) {
