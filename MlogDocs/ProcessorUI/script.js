@@ -531,7 +531,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
         </div>`
     );
 
-    newElement = lastContainer.nextElementSibling 
+    const newElement = lastContainer.nextElementSibling 
 
     if (triggerPopupMenu) {      
         // const onclickSpan = newElement.querySelectorAll('[onclick]')[2]
@@ -541,14 +541,13 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                                     // probably shouldn't use ('[onclick]')[2]
         selectOption(null,tpmId,(newElement.querySelectorAll('[onclick]')[2]),newElement.querySelector('.selectionValue').textContent)
     }
-    if (update == 0){
-        return
-    } else {
+    if (update != 0) {
         updateLineNumber();
     }
     console.log(`${performance.now() - pfstart}`);
 
-    };
+    return newElement;
+};
 
 //count and update line number on instruction
 
@@ -2417,55 +2416,9 @@ const operatorMap = {
     "acos"      : 'acos',
     "atan"      : 'atan',
     "always"    : 'always',
+}
 
-    'add'               : 'add', // UGLY, idk other way though
-    'sub'               : 'sub',
-    'mul'               : 'mul',
-    'div'               : 'div',
-    'idiv'              : 'idiv',
-    'mod'               : 'mod',
-    'emod'              : 'emod',
-    'pow'               : 'pow',
-    'equal'             : 'equal',
-    'notEqual'          : 'notEqual',
-    'land'              : 'land',
-    'lessThan'          : 'lessThan',
-    'lessThanEqual'     : 'lessThanEqual',
-    'greaterThan'       : 'greaterThan',
-    'greaterThanEqual'  : 'greaterThanEqual',
-    'strictEqual'       : 'strictEqual',
-    'shl'               : 'shl',
-    'shr'               : 'shr',
-    'or'                : 'or',
-    'and'               : 'and',
-    'xor'               : 'xor',
-    // 'not'               : 'flip',
-    'max'               : 'max',
-    'min'               : 'min',
-    'angle'             : 'angle',
-    'angleDiff'         : 'angleDiff',
-    'len'               : 'len',
-    'noise'             : 'noise',
-    'abs'               : 'abs',
-    'sign'              : 'sign',
-    'log'               : 'log',
-    'logn'              : 'logn',
-    'log10'             : 'log10',
-    'floor'             : 'floor',
-    'ceil'              : 'ceil',
-    'round'             : 'round',
-    'sqrt'              : 'sqrt',
-    'rand'              : 'rand',
-    'sin'               : 'sin',
-    'cos'               : 'cos',
-    'tan'               : 'tan',
-    'asin'              : 'asin',
-    'acos'              : 'acos',
-    'atan'              : 'atan',
-    'always'            : 'always',
-};
-
-let instTypeMap = {
+const instTypeMap = {
     'Read'          : 'read',
     'Write'         : 'write',
     'Draw'          : 'draw',
@@ -2516,8 +2469,8 @@ let instTypeMap = {
     'Make Marker'   : 'makemarker',
     'Locale Print'  : 'localeprint',
     'Print Char'    : 'printchar',
-
 } 
+
 function exportCode(save){
     // deselectContainer();
     codeEx = ""
@@ -2634,7 +2587,7 @@ function exportCode(save){
                         // console.log(code);
                         codeId = code.id
                         if (codeId === 'operation'){
-                            codeEx += operatorMap[code.textContent] + ' '
+                            codeEx += (operatorMap[code.textContent] ?? code.textContent) + ' '
                         }else if (codeId === 'string') {
                             codeEx += (code.textContent + ' ');
                         } else {
@@ -2661,55 +2614,15 @@ function exportCode(save){
 }
 
 
-let instTypeMapR = {
-    'read'      : 'Read',
-    'write'     : 'Write',
-    'draw'      : 'Draw',
-    'print'     : 'Print',
-    'format'    : 'Format',
-    'drawflush' : 'Draw Flush',
-    'printflush': 'Print Flush',
-    'getlink'   : 'Get Link',
-    'control'   : 'Control',
-    'radar'     : 'Radar',
-    'sensor'    : 'Sensor',
-    'set'       : 'Set',
-    'op'        : 'Operation',
-    'lookup'    : 'Lookup',
-    'packcolor' : 'Pack Color',
-    'wait'      : 'Wait',
-    'stop'      : 'Stop',
-    'end'       : 'End',
-    'jump'      : 'Jump',
-    'ubind'     : 'Unit Bind',
-    'ucontrol'  : 'Unit Control',
-    'uradar'    : 'Unit Radar',
-    'ulocate'   : 'Unit Locate',
 
-    'getblock'     : 'Get Block',
-    'setblock'     : 'Set Block',
-    'spawn'        : 'Spawn Unit',
-    'bullet'       : 'Spawn Bullet',
-    'status'       : 'Apply Status',
-    'weathersense' : 'Weather Sense',
-    'weatherset'   : 'Weather Set',
-    'spawnwave'    : 'Spawn Wave',
-    'setrule'      : 'Set Rule',
-    'message'      : 'Flush Message',
-    'cutscene'     : 'Cutscene',
-    'effect'       : 'Effect',
-    'explosion'    : 'Explosion',
-    'setrate'      : 'Set Rate',
-    'fetch'        : 'Fetch',
-    'sync'         : 'Sync',
-    'getflag'      : 'Get Flag',
-    'setflag'      : 'Set Flag',
-    'setprop'      : 'Set Prop',
-    'playsound'    : 'Play Sound',
-    'setmarker'    : 'Set Marker',
-    'localeprint'  : 'Locale Print',
-    'printchar'    : 'Print Char',
-}
+const operatorMapR = Object.fromEntries(
+    Object.entries(operatorMap).map(([key, val]) => [val, key])
+);
+
+const instTypeMapR = Object.fromEntries(
+    Object.entries(instTypeMap).map(([key, val]) => [val, key])
+);
+
 // ########################################################################################################################
 // import
 // ########################################################################################################################
@@ -2780,7 +2693,14 @@ async function importCode(manual,codeSaved){
                 'Set Marker'].includes(type)) {
                 triggerPopupMenu = true
             }
-            addInstruction(type, 0, words[1], words[2], words[3], words[4], words[5], words[6], words[7], words[8], words[9], triggerPopupMenu)
+
+            const inst = addInstruction(type, 0, ...words.slice(1,13), triggerPopupMenu);
+            const selectionSpan = inst.querySelector(".selectionValue");
+            if (selectionSpan) {
+                const selection = selectionSpan.textContent;
+                selectionSpan.textContent = operatorMapR[selection] ?? selection;
+            }
+
         } else {
             if (words[0].endsWith(":")){
                 addInstruction('Label', 0, words[0].replace(":",""))
