@@ -582,6 +582,7 @@ function updateLineNumber() {
 }
 
 function updateJumpArrow(jumpIns) {
+    const lane = 0
     jumpIns.forEach(jump => {
         const canvas = jump.querySelector('.jumpArrow');
         // console.log(canvas);
@@ -616,17 +617,23 @@ function updateJumpArrow(jumpIns) {
         canvas.height = distance+20
         canvas.width = 100
 
-        // im so lazy so optimize this, point is it works
+        const laneOffset = 40 + (lane * 10)
+        const dy = (desRect && containerrRect.top === desRect.top) ? 0 : laneOffset/2
+
+        const bottom = distance+20
+
         ctx.strokeStyle = 'white'
-        ctx.lineWidth = 2
+        ctx.lineWidth = 4
         if (canvas.style.bottom === ''){
+            // going down
             ctx.beginPath()
-            ctx.moveTo(10, distance+10)
-            ctx.bezierCurveTo(100, distance/0.95, 100, distance/1024, 0, 10)
+            ctx.moveTo(5, 10) // the 5 is a magic value ¯\_(ツ)_/¯
+            ctx.lineTo(laneOffset, 10 + dy)
+            ctx.lineTo(laneOffset, bottom - 10 - dy)
+            ctx.lineTo(15, bottom - 10)
             ctx.stroke()
             ctx.closePath()
             ctx.beginPath()
-            const bottom = distance+20
             ctx.moveTo(15,bottom - 5)
             ctx.lineTo(15,bottom - 15)
             ctx.lineTo(5,bottom - 10)
@@ -635,9 +642,12 @@ function updateJumpArrow(jumpIns) {
             ctx.fill()
             ctx.stroke();
         } else {
+            // going up
             ctx.beginPath()
-            ctx.moveTo(0, distance + 10)
-            ctx.bezierCurveTo(100, distance/1.05, 100, distance/1024, 10, 10)
+            ctx.moveTo(5, bottom - 10)
+            ctx.lineTo(laneOffset, bottom - 10 - dy)
+            ctx.lineTo(laneOffset, 10 + dy)
+            ctx.lineTo(15, 10)
             ctx.stroke()
             ctx.closePath()
             ctx.beginPath()
@@ -1214,6 +1224,7 @@ const handleMove = (e) => {
 
         ctx.beginPath()
         ctx.moveTo(moveTo[0],moveTo[1])
+        // TODO
         ctx.bezierCurveTo(curveTo[0], curveTo[1], 
                         curveTo[2], curveTo[3],
                         curveTo[4], curveTo[5])
