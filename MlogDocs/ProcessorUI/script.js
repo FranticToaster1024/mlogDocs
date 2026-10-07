@@ -581,29 +581,54 @@ function updateLineNumber() {
     // console.log(jumpIns);
 }
 
+
+function assignLane(jumpSrc, jumpDest, lanes) {
+    const jumpMin = Math.min(jumpSrc, jumpDest);
+    const jumpMax = Math.max(jumpSrc, jumpDest);
+
+    for (const [i, lane] of lanes.entries()) {
+        if (jumpMin > lane.max || lane.dests.has(jumpDest)) {
+            lane.max = Math.max(jumpMax, lane.max);
+            lane.dests.add(jumpDest);
+            return i;
+        }
+    }
+
+    lanes.push({ max: jumpMax, dests: new Set([jumpDest]) });
+    return lanes.length - 1;
+}
+
 function updateJumpArrow(jumpIns) {
-    const lane = 0
-    jumpIns.forEach(jump => {
+    const destinations = document.querySelectorAll('#lineNumber');
+    const labels = document.querySelectorAll('.container#exclude');
+    function getDestTgt (jump) {
+        let destinationTarget = destinations[parseInt(jump.querySelector('#field1Value').textContent)]?.closest('.container')
+        if (!destinationTarget && labels){
+            labels.forEach(label => {
+                if (label.querySelector('#field1').textContent == jump.querySelector('#field1Value').textContent){
+                    return label
+                }
+            })
+        }
+        return destinationTarget
+    }
+
+    const containers = Array.from(document.querySelectorAll('.container'));
+    const indexMap = new Map(containers.map((item, idx) => [item, idx]));
+
+    const lanes = [];
+    jumpIns = jumpIns
+        .map((jump) => [jump.closest('.container'), getDestTgt(jump)])
+        .sort((a, b) => indexMap.get(a[0]) - indexMap.get(b[0]));
+    
+    jumpIns.forEach(([jump, destinationTarget]) => {
         const canvas = jump.querySelector('.jumpArrow');
         // console.log(canvas);
 
         const ctx = canvas.getContext('2d');
-        const containerrRect = (jump.closest('.container')).getBoundingClientRect();
-        const destinations = document.querySelectorAll('#lineNumber');
+        const containerrRect = jump.getBoundingClientRect();
 
-        let destinationTarget = destinations[parseInt(jump.querySelector('#field1Value').textContent)]?.closest('.container')
-        if (!destinationTarget){
-            labels = document.querySelectorAll('.container#exclude')
-            if (labels){
-                labels.forEach(label => {
-                    if (label.querySelector('#field1').textContent == jump.querySelector('#field1Value').textContent){
-                        destinationTarget = label
-                    }
-                })
-            }
-        }
-
-        const desRect = destinationTarget?.getBoundingClientRect(); 
+        const desRect = destinationTarget?.getBoundingClientRect();
         let distance = (containerrRect.top + containerrRect.height / 2) - (desRect?.top + desRect?.height / 2)
         if (distance > 0){
             canvas.style.bottom = `10%`
@@ -617,6 +642,11 @@ function updateJumpArrow(jumpIns) {
         canvas.height = distance+20
         canvas.width = 100
 
+
+        const jumpSrc = indexMap.get(jump);
+        const jumpDest = indexMap.get(destinationTarget);
+
+        const lane = assignLane(jumpSrc, jumpDest, lanes);
         const laneOffset = 40 + (lane * 10)
         const dy = (desRect && containerrRect.top === desRect.top) ? 0 : laneOffset/2
 
