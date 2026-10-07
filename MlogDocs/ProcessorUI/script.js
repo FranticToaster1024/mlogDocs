@@ -640,7 +640,7 @@ function updateJumpArrow(jumpIns) {
         canvas.style.left = ''
         distance = Math.abs(distance)
         canvas.height = distance+20
-        canvas.width = 100
+        canvas.width = 150
 
 
         const jumpSrc = indexMap.get(jump);
