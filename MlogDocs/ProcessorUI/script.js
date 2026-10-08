@@ -598,6 +598,9 @@ function assignLane(jumpSrc, jumpDest, lanes) {
     return lanes.length - 1;
 }
 
+const trailColors = ['#ffd700', '#da70d6', '#179fff'];
+const inboundArrowOffset = 16;
+const verticalCanvasPadding = 20;
 function updateJumpArrow(jumpIns) {
     const destinations = document.querySelectorAll('#lineNumber');
     const labels = document.querySelectorAll('.container#exclude');
@@ -639,7 +642,7 @@ function updateJumpArrow(jumpIns) {
         }
         canvas.style.left = ''
         distance = Math.abs(distance)
-        canvas.height = distance+20
+        canvas.height = distance + 2 * verticalCanvasPadding
         canvas.width = 150
 
 
@@ -650,45 +653,61 @@ function updateJumpArrow(jumpIns) {
         const laneOffset = 40 + (lane * 10)
         const dy = (desRect && containerrRect.top === desRect.top) ? 0 : laneOffset/2
 
-        const bottom = distance+20
-
-        ctx.strokeStyle = 'white'
+        ctx.strokeStyle = trailColors[lane % trailColors.length];
+        ctx.fillStyle = trailColors[lane % trailColors.length];
         ctx.lineWidth = 4
-        if (canvas.style.bottom === ''){
-            // going down
+        
+        const img = new Image();
+        img.onload = () => {
+            function drawFlippedWithColor(x, y) {
+                ctx.save();
+                ctx.translate(x + img.width, y);
+                ctx.scale(-1, 1);
+                ctx.drawImage(img, 0, 0);
+
+                ctx.globalCompositeOperation = 'source-in';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+
+                ctx.restore();
+            }
+
+            const canvasRect = canvas.getBoundingClientRect();
+
+            const srcArrowRect = jump.querySelector('.jumpArrowTriangle').getBoundingClientRect();
+            const srcArrowMidY = (srcArrowRect.top - canvasRect.top) + srcArrowRect.height / 2;
+
+            const desArrowRect = destinationTarget.querySelector('.jumpArrowTriangle')?.getBoundingClientRect();
+            const desArrowMidY = desArrowRect
+                ? desArrowRect.top - canvasRect.top
+                : null
+            
             ctx.beginPath()
-            ctx.moveTo(5, 10) // the 5 is a magic value ¯\_(ツ)_/¯
-            ctx.lineTo(laneOffset, 10 + dy)
-            ctx.lineTo(laneOffset, bottom - 10 - dy)
-            ctx.lineTo(15, bottom - 10)
-            ctx.stroke()
-            ctx.closePath()
-            ctx.beginPath()
-            ctx.moveTo(15,bottom - 5)
-            ctx.lineTo(15,bottom - 15)
-            ctx.lineTo(5,bottom - 10)
-            ctx.closePath()
-            ctx.fillStyle = 'white';
-            ctx.fill()
+            if (canvas.style.bottom === ''){
+                // going down
+                ctx.moveTo(5, srcArrowMidY) // the 5 is a magic value ¯\_(ツ)_/¯
+                ctx.lineTo(laneOffset, srcArrowMidY + dy)
+
+                const bottom = canvas.height - verticalCanvasPadding;
+                const arrowEndY = desArrowMidY ?? bottom - img.height / 2;
+                ctx.lineTo(laneOffset, arrowEndY - dy)
+                // divide x by 2 cuz the arrow only occupies half the image horizontally
+                ctx.lineTo(img.width / 2, arrowEndY)
+                drawFlippedWithColor(0, arrowEndY - img.height / 2)
+            } else {
+                // going up
+                ctx.moveTo(5, srcArrowMidY)
+                ctx.lineTo(laneOffset, srcArrowMidY - dy)
+
+                const top = verticalCanvasPadding;
+                const arrowEndY = desArrowMidY ?? top - img.height / 2;
+                ctx.lineTo(laneOffset, arrowEndY + dy)
+                ctx.lineTo(img.width / 2, arrowEndY)
+                drawFlippedWithColor(0, arrowEndY - img.height / 2)
+            }
             ctx.stroke();
-        } else {
-            // going up
-            ctx.beginPath()
-            ctx.moveTo(5, bottom - 10)
-            ctx.lineTo(laneOffset, bottom - 10 - dy)
-            ctx.lineTo(laneOffset, 10 + dy)
-            ctx.lineTo(15, 10)
-            ctx.stroke()
-            ctx.closePath()
-            ctx.beginPath()
-            ctx.moveTo(15,5)
-            ctx.lineTo(15,15)
-            ctx.lineTo(5,10)
-            ctx.closePath()
-            ctx.fillStyle = 'white';
-            ctx.fill()
-            ctx.stroke();
-        }
+        };
+        img.src = "image/logic-node.png";
     // ctx.quadraticCurveTo(100, distance/2, 0, 0);
     })
 }
