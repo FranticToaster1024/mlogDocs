@@ -589,7 +589,7 @@ function assignLane(jumpSrc, jumpDest, lanes) {
     const jumpMax = Math.max(jumpSrc, jumpDest);
 
     for (const [i, lane] of lanes.entries()) {
-        if (jumpMin > lane.max || lane.dests.has(jumpDest)) {
+        if (jumpMin >= lane.max || lane.dests.has(jumpDest)) {
             lane.max = Math.max(jumpMax, lane.max);
             lane.dests.add(jumpDest);
             return i;
