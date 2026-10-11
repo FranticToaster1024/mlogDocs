@@ -558,7 +558,7 @@ function updateLineNumber() {
     let jumpIns = [];
     containers = document.querySelectorAll('.container:not(#exclude)'); //can use :has() but i heard its not supported in older browser
     containers.forEach((container, index) => {
-        const lineNumberElement = containerr.querySelector('#lineNumber');
+        const lineNumberElement = container.querySelector('#lineNumber');
         
         if (lineNumberElement.textContent !== index) {
             lineNumberChanges[lineNumberElement.textContent] = index;
