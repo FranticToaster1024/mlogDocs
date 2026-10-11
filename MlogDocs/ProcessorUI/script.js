@@ -576,8 +576,8 @@ function updateLineNumber() {
     });
 
     jumpIns.forEach((jumpContainer) => {
-        const destElement = jumpContainer.querySelector('#field1Value');
-        destElement.textContent = lineNumberChanges[destElement.textContent] ?? destElement.textContent;
+        const destField = jumpContainer.querySelector('#field1Value');
+        destField.textContent = lineNumberChanges[destField.textContent] ?? destField.textContent;
     })
 
     labels = document.querySelectorAll('.container#exclude') //i know this is a shitty fix
@@ -2860,7 +2860,6 @@ async function importCode(manual,codeSaved){
                 'Control', 
                 'Draw', 
                 'Unit Control', 
-                'Unit Locate',
                 'Operation',
                 'Select',
                 'Jump', 
@@ -2878,18 +2877,21 @@ async function importCode(manual,codeSaved){
             const inst = addInstruction(type, 0, ...words.slice(1));
             if (triggerPopupMenu) {
                 const selectionSpan = inst.querySelector(".selectionValue");
-                // raw mlog name of the selection
-                const selection = selectionSpan.textContent;
-                const mappedSelection = operatorMapR[selection] ?? selection;
+                
+                if (selectionSpan) {
+                    // raw mlog name of the selection
+                    const selection = selectionSpan.textContent;
+                    const mappedSelection = operatorMapR[selection] ?? selection;
 
-                selectionSpan.textContent = mappedSelection;
-
-                selectOption(
-                    null,
-                    selectionSpan.getAttribute('tpmId'),
-                    inst.querySelector('.code').querySelector('[onclick]'),
-                    mappedSelection,
-                );
+                    selectionSpan.textContent = mappedSelection;
+                
+                    selectOption(
+                        null,
+                        selectionSpan.getAttribute('tpmId'),
+                        inst.querySelector('.code').querySelector('[onclick]'),
+                        mappedSelection,
+                    );
+                }
             }
 
         } else {
