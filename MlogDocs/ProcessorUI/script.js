@@ -610,6 +610,25 @@ function assignLane(jumpSrc, jumpDest, lanes) {
 }
 
 
+const waitImgLoad = (img) => new Promise((resolve, reject) => {
+    if (!img) {
+        resolve(img);
+        return;
+    }
+
+    if (img.complete) {
+        if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+            reject(new Error('Image has invalid dimensions.'));
+            return;
+        }
+        resolve(img);
+        return;
+    }
+
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Image failed to load.'));
+});
+
 const verticalCanvasPadding = 20;
 function updateJumpArrow(jumpIns) {
     const destinations = document.querySelectorAll('#lineNumber');
@@ -630,20 +649,30 @@ function updateJumpArrow(jumpIns) {
     const indexMap = new Map(containers.map((item, idx) => [item, idx]));
 
     const lanes = [];
-    jumpIns = jumpIns
+    const jumpsWithLanes = jumpIns
         .map((jump) => [jump.closest('.container'), getDestTgt(jump)])
-        .sort((a, b) => indexMap.get(a[0]) - indexMap.get(b[0]));
+        .sort((a, b) => indexMap.get(a[0]) - indexMap.get(b[0]))
+        .map(([jump, destinationTarget]) => ({
+            jump,
+            destinationTarget,
+            lane: assignLane(
+                indexMap.get(jump),
+                indexMap.get(destinationTarget),
+                lanes,
+            ),
+        }));
     
-    jumpIns.forEach(([jump, destinationTarget]) => {
+    jumpsWithLanes.forEach(async ({ jump, destinationTarget, lane }) => {
+        const srcArrow = await waitImgLoad(jump.querySelector('.jumpArrowTriangle'));
+        const destArrow = await waitImgLoad(
+            destinationTarget?.querySelector('.jumpArrowTriangle')
+        )
+
         const containerRect = jump.getBoundingClientRect();
         const destRect = destinationTarget?.getBoundingClientRect();
 
         const distance = (containerRect.top + containerRect.height / 2)
             - (destRect?.top + destRect?.height / 2)
-        
-        const jumpSrc = indexMap.get(jump);
-        const jumpDest = indexMap.get(destinationTarget);
-        const lane = assignLane(jumpSrc, jumpDest, lanes);
         
         const laneOffset = 40 + (lane * 10)
         const slantDeltaY = Math.sign(distance) * laneOffset * 0.5
@@ -653,11 +682,11 @@ function updateJumpArrow(jumpIns) {
         canvas.height = Math.abs(distance) + 2 * verticalCanvasPadding
         canvas.width = 150
         
-        const destVerticalEdge = distance > 0
+        const destVerticalEdge = distance >= 0
             ? verticalCanvasPadding
             : canvas.height - verticalCanvasPadding;
 
-        if (distance > 0){
+        if (distance >= 0){
             canvas.style.bottom = `10%`
             canvas.style.top = ''
         }else {
@@ -668,11 +697,10 @@ function updateJumpArrow(jumpIns) {
 
         const canvasRect = canvas.getBoundingClientRect();
 
-        const srcArrow = jump.querySelector('.jumpArrowTriangle')
         const srcArrowRect = srcArrow.getBoundingClientRect();
         const srcArrowMidY = (srcArrowRect.top - canvasRect.top) + srcArrowRect.height / 2;
 
-        const destArrowRect = destinationTarget?.querySelector('.jumpArrowTriangle')?.getBoundingClientRect();
+        const destArrowRect = destArrow?.getBoundingClientRect();
         const destArrowMidY = destArrowRect
             ? destArrowRect.top - canvasRect.top
             : null
@@ -691,16 +719,21 @@ function updateJumpArrow(jumpIns) {
 }
 
 
-const loadImg = (srcString) => {
+const loadImg = (srcString) => new Promise((resolve, reject) => {
     const img = new Image()
 
-    return new Promise((resolve, reject) => {
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error("Image failed to load."));
+    img.onload = () => {
+        if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+            reject(new Error(`Image '${srcString}' loaded with invalid dimensions.`));
+            return;
+        }
+        resolve(img);
+    };
+    img.onerror = () => reject(new Error('Image failed to load.'));
 
-        img.src = srcString;
-    });
-}
+    img.src = srcString;
+});
+
 const trailColors = ['#ffd700', '#da70d6', '#179fff'];
 async function drawJumpArrow(
     ctx,
@@ -720,17 +753,18 @@ async function drawJumpArrow(
 
     const trailColor = trailColors[lane % trailColors.length];
 
+    const arrowImage = await loadImg('image/logic-node.png')
 
     // use a canvas to color the logic-node image
     // this is used for both the src and dest arrow
     const coloredArrow = document.createElement('canvas')
-    coloredArrow.width = srcArrowElement.width;
-    coloredArrow.height = srcArrowElement.height;
+    coloredArrow.width = arrowImage.naturalWidth;
+    coloredArrow.height = arrowImage.naturalHeight;
 
     const tmpCtx = coloredArrow.getContext('2d');
     tmpCtx.fillStyle = trailColor;
 
-    tmpCtx.drawImage(await loadImg('image/logic-node.png'), 0, 0);
+    tmpCtx.drawImage(arrowImage, 0, 0);
     // color the img
     tmpCtx.globalCompositeOperation = 'source-in';
     tmpCtx.fillRect(0, 0, coloredArrow.width, coloredArrow.height);
