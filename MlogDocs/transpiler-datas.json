@@ -1,4 +1,4 @@
-{"date_updated": "2026-10-05 04:00:45", "repos": [
+{"date_updated": "2026-10-11 03:56:53", "repos": [
 {
   "html_url": "https://github.com/cardillan/mindcode",
   "short_name": "Mindcode",
@@ -49,8 +49,8 @@
   "short_name": "Mlog JS",
   "description": "Compile javascript into Mindustry logic code (mlog)",
   "owner": "mlogjs",
-  "updated_at": "2026-09-05T00:46:51Z",
-  "stargazers_count": 96
+  "updated_at": "2026-10-10T05:04:20Z",
+  "stargazers_count": 97
 }
 ,
 {
