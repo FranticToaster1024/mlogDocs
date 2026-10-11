@@ -734,7 +734,7 @@ const loadImg = (srcString) => new Promise((resolve, reject) => {
     img.src = srcString;
 });
 
-const trailColors = ['#ffd700', '#da70d6', '#179fff'];
+const goldenRatioConjugate = 0.6180339887498949;
 async function drawJumpArrow(
     ctx,
     laneOffset,
@@ -751,7 +751,8 @@ async function drawJumpArrow(
     }
 
 
-    const trailColor = trailColors[lane % trailColors.length];
+    const arrowColorHue = (lane * goldenRatioConjugate) % 1;
+    const arrowColor = `hsl(${Math.round(arrowColorHue * 360)}, 80%, 80%)`;
 
     const arrowImage = await loadImg('image/logic-node.png')
 
@@ -762,7 +763,7 @@ async function drawJumpArrow(
     coloredArrow.height = arrowImage.naturalHeight;
 
     const tmpCtx = coloredArrow.getContext('2d');
-    tmpCtx.fillStyle = trailColor;
+    tmpCtx.fillStyle = arrowColor;
 
     tmpCtx.drawImage(arrowImage, 0, 0);
     // color the img
@@ -774,8 +775,8 @@ async function drawJumpArrow(
     srcArrowElement.src = coloredArrow.toDataURL('image/png');
 
 
-    ctx.strokeStyle = trailColor;
-    ctx.fillStyle = trailColor;
+    ctx.strokeStyle = arrowColor;
+    ctx.fillStyle = arrowColor;
     ctx.lineWidth = 4
 
     const arrowEndY = destArrowMidY ?? destVerticalEdge - coloredArrow.height / 2;
