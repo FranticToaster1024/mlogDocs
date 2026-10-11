@@ -583,6 +583,8 @@ function updateLineNumber() {
 
 
 function assignLane(jumpSrc, jumpDest, lanes) {
+    if (jumpDest === undefined) return -1;
+
     const jumpMin = Math.min(jumpSrc, jumpDest);
     const jumpMax = Math.max(jumpSrc, jumpDest);
 
@@ -677,7 +679,7 @@ function updateJumpArrow(jumpIns) {
             const srcArrowRect = jump.querySelector('.jumpArrowTriangle').getBoundingClientRect();
             const srcArrowMidY = (srcArrowRect.top - canvasRect.top) + srcArrowRect.height / 2;
 
-            const desArrowRect = destinationTarget.querySelector('.jumpArrowTriangle')?.getBoundingClientRect();
+            const desArrowRect = destinationTarget?.querySelector('.jumpArrowTriangle')?.getBoundingClientRect();
             const desArrowMidY = desArrowRect
                 ? desArrowRect.top - canvasRect.top
                 : null
