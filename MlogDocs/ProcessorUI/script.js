@@ -9,7 +9,7 @@ buttons.forEach(button => {
     button.addEventListener('click', () => addInstruction(button))
 });
     
-function addInstruction(button, update, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11, field12, field13, triggerPopupMenu){
+function addInstruction(button, update, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11, field12, field13){
     const pfstart = performance.now()
     
     if (typeof button === 'string') {
@@ -23,7 +23,6 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
     closeWizard();
     
     let exclude = 0
-    let tpmId = ''
     //Switch for every instruction type
     switch (buttonText) {
         case 'Read':
@@ -43,7 +42,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable iNo" contenteditable="true">${field3 || '0'}</span>`
             break;
         case 'Draw':
-            code = `<span class="editable iNo selectionValue" contenteditable="true" onclick="popUpMenu(event,'drawMenu')" oninput="selectOption(event,'drawMenu', null, null, 1)">${field1 || 'clear'}</span>
+            code = `<span class="editable iNo selectionValue" tpmId="drawMenu" contenteditable="true" onclick="popUpMenu(event,'drawMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)">${field1 || 'clear'}</span>
                     <span class="toggleableField" order="11" style="display:block;">r</span>
                     <span class="editable iNo toggleableField" order="1" contenteditable="true" style="display:block;">${field2 || '0'}</span>
                     <span class="toggleableField" order="22" style="display:block;">g</span>
@@ -56,7 +55,6 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable iNo toggleableField" order="5" contenteditable="true">${field6 || '0'}</span>
                     <span class="toggleableField" order="66">a</span>
                     <span class="editable iNo toggleableField" order="6" contenteditable="true">${field7 || '0'}</span>`
-            tpmId = "drawMenu";
             break;
         case 'Print':
             code = `<span class="editable iNo" id="string" contenteditable="true">${field1 || '\"frog\"'}</span>`
@@ -84,7 +82,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
             break;
         case 'Control':
             code = `<span>set</span>
-                    <span class="editable blockControl selectionValue" contenteditable="true" onclick="popUpMenu(event,'controlMenu')" oninput="selectOption(event,'controlMenu', null, null, 1)" order="1">${field1 || 'enabled'}</span>
+                    <span class="editable blockControl selectionValue" tpmId="controlMenu" contenteditable="true" onclick="popUpMenu(event,'controlMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)" order="1">${field1 || 'enabled'}</span>
                     <span>of</span>
                     <span class="editable blockControl" contenteditable="true" order="2">${field2 || 'block1'}</span>
                     <span class="toggleableField" id="field2" style="display:block;" order="33">to</span>
@@ -93,7 +91,6 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable blockControl toggleableField" id="field3Value" contenteditable="true" order="4">${field4 || '0'}</span>
                     <span class="toggleableField" id="field4" order="55"></span>
                     <span class="editable blockControl toggleableField" id="field4Value" contenteditable="true" order="5">${field5 || '0'}</span>`
-            tpmId = "controlMenu";
             break;
         case 'Radar':
             code = `<span>from</span>
@@ -128,9 +125,20 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
             code = `<span class="editable operation" contenteditable="true" order="2">${field2 || 'result'}</span>
                     <span>=</span>
                     <span class="editable operation" contenteditable="true" order="3">${field3 || 'a'}</span>
-                    <span class="editable operation selectionValue" id="operation" order="1" contenteditable="true" onclick="popUpMenu(event,'opMenu')" oninput="selectOption(event,'opSuggestion', null, null, 1)">${field1 || '*'}</span>
+                    <span class="editable operation selectionValue" id="operation" order="1" tpmId="opMenu" contenteditable="true" onclick="popUpMenu(event,'opMenu')" oninput="selectOption(event, 'opSuggestion', null, null, 1)">${field1 || '*'}</span>
                     <span class="editable operation toggleableField" contenteditable="true" style="display:block;" order="4">${field4 || 'b'}</span>`
-            tpmId = "opMenu";
+            break;
+        case 'Select':
+            code = `<span class="editable operation" contenteditable="true" style="display:block;" order="1">${field1 || 'result'}</span>
+                    <span>=</span>
+                    <span>if</span>
+                    <span class="editable operation toggleableField" contenteditable="true" style="display:block;" order="3">${field3 || 'x'}</span>
+                    <span class="editable operation selectionValue" id="operation" tpmId="selectMenu" contenteditable="true" onclick="popUpMenu(event,'jumpMenu')" oninput="selectOption(event,'jumpMenu', null, null, 1)" order="2">${field2 || 'not'}</span>
+                    <span class="editable operation toggleableField" contenteditable="true" style="display:block;" order="4">${field4 || 'false'}</span>
+                    <span>then</span>
+                    <span class="editable operation" contenteditable="true" style="display:block;" order="5">${field5 || 'a'}</span>
+                    <span>else</span>
+                    <span class="editable operation" contenteditable="true" style="display:block;" order="6">${field6 || 'b'}</span>`
             break;
         case 'Lookup':
             code = `<span class="editable operation" contenteditable="true" id="field1Value">${field2 || 'result'}</span>
@@ -149,6 +157,15 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable operation" contenteditable="true">${field4 || '0'}</span>
                     <span class="editable operation" contenteditable="true">${field5 || '1'}</span>`
             break;
+        case 'Unpack Color':
+            code = `<span class="editable operation" contenteditable="true">${field1 || 'r'}</span>
+                    <span class="editable operation" contenteditable="true">${field2 || 'g'}</span>
+                    <span class="editable operation" contenteditable="true">${field3 || 'b'}</span>
+                    <span class="editable operation" contenteditable="true">${field4 || 'a'}</span>
+                    <span>=</span>
+                    <span>unpack</span>
+                    <span class="editable operation" contenteditable="true">${field5 || 'color'}</span>`
+            break;
         case 'Wait':
             code = `<span class="editable flowControl" contenteditable="true">${field1 || 'result'}</span>
                     <span>sec</span>`
@@ -162,7 +179,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
         case 'Jump':
             code = `<span>if</span>
                     <span class="editable flowControl toggleableField" contenteditable="true" style="display:block;" order="3">${field3 || 'x'}</span>
-                    <span class="editable flowControl selectionValue" id="operation" contenteditable="true" onclick="popUpMenu(event,'jumpMenu')" oninput="selectOption(event,'jumpMenu', null, null, 1)" order="2">${field2 || 'not'}</span>
+                    <span class="editable flowControl selectionValue" id="operation" tpmId="jumpMenu" contenteditable="true" onclick="popUpMenu(event,'jumpMenu')" oninput="selectOption(event, this.getAttribute('tpmId'), null, null, 1)" order="2">${field2 || 'not'}</span>
                     <span class="editable flowControl toggleableField" contenteditable="true" style="display:block;" order="4">${field4 || 'false'}</span>
                     <div class="jumpTo">
                         <span>Jump To</span>
@@ -170,14 +187,13 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     </div>
                     <canvas class="jumpArrow" width=60></canvas>
                     <img src="image/logic-node.png" alt="" class="jumpArrowTriangle" draggable="false">`
-            tpmId = "jumpMenu";
             break;
         case 'Unit Bind':
             code = `<span>type</span>
                     <span class="editable unitControl" contenteditable="true" onclick="popUpMenu(event,'ubindMenu')" oninput="selectOption(event,'ubindMenu', null, null, 1)">${field1 || '@poly'}</span>`
             break;
         case 'Unit Control':
-            code = `<span class="editable unitControl selectionValue" contenteditable="true" order="1" onclick="popUpMenu(event,'ucontrolMenu')" oninput="selectOption(event,'ucontrolMenu', null, null, 1)">${field1 || 'move'}</span>
+            code = `<span class="editable unitControl selectionValue" order="1" tpmId="ucontrolMenu" contenteditable="true" onclick="popUpMenu(event,'ucontrolMenu')" oninput="selectOption(event, this.getAttribute('tpmId'), null, null, 1)">${field1 || 'move'}</span>
                     <span class="toggleableField" id="field1" style="display:block;" order="11">x</span>
                     <span class="editable unitControl toggleableField" id="field1Value" contenteditable="true" style="display:block;" order="2">${field2 || '0'}</span>
                     <span class="toggleableField" id="field2" style="display:block;" order="22">y</span>
@@ -188,7 +204,6 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable unitControl toggleableField" id="field4Value" contenteditable="true" order="5">${field5 || '0'}</span>
                     <span class="toggleableField" id="field5" order="55">y</span>
                     <span class="editable unitControl toggleableField" id="field5Value" contenteditable="true" order="6">${field6 || '0'}</span>`
-            tpmId = "ucontrolMenu";
             break;
         case 'Unit Radar':
             code = `<span>target</span>
@@ -251,7 +266,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
             break;
         case 'Set Block':
             code = `<span>set</span>
-                    <span class="editable world selectionValue" contenteditable="true" order="1" onclick="popUpMenu(event,'setBlockMenu')" oninput="selectOption(event,'setBlockMenu', null, null, 1)">${field1 || 'floor'}</span>
+                    <span class="editable world selectionValue" contenteditable="true" order="1" tpmId="setBlockMenu" onclick="popUpMenu(event,'setBlockMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)">${field1 || 'floor'}</span>
                     <span>at</span>
                     <span class="editable world" contenteditable="true" order="3">${field3 || '0'}</span>
                     <span>,</span>
@@ -262,7 +277,6 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable world toggleableField" contenteditable="true" order="5">${field5 || '@derelic'}</span>
                     <span class="toggleableField" order="6">rot</span>
                     <span class="editable world toggleableField" contenteditable="true" order="6">${field6 || '0'}</span>`
-            tpmId = "setBlockMenu"
             break;
         case 'Spawn Unit':
             code = `<span class="editable world" contenteditable="true" order="6">${field6 || 'result'}</span>
@@ -341,7 +355,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     
             break;
         case 'Set Rule':
-            code = `<span class="editable world selectionValue" contenteditable="true" onclick="popUpMenu(event,'setRuleMenu')" oninput="selectOption(event,'setRuleMenu', null, null, 1)" order="1">${field1 || 'waveSpacing'}</span>
+            code = `<span class="editable world selectionValue" contenteditable="true" tpmId="setRuleMenu" onclick="popUpMenu(event,'setRuleMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)" order="1">${field1 || 'waveSpacing'}</span>
                     <span class="toggleableField" style="display:block;" order="11">=</span>
                     <span class="editable world toggleableField" style="display:block;" contenteditable="true" order="2">${field2 || '10'}</span>
                     <span class="toggleableField" order="3">x</span>
@@ -352,29 +366,26 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable world toggleableField" contenteditable="true" order="5">${field5 || '100'}</span>
                     <span class="toggleableField" order="6">h</span>
                     <span class="editable world toggleableField" contenteditable="true" order="6">${field6 || '100'}</span>`
-            tpmId = "setRuleMenu"
             break;
         case 'Flush Message':
-            code = `<span class="editable world selectionValue" contenteditable="true" onclick="popUpMenu(event,'flushMessageMenu')" oninput="selectOption(event,'flushMessageMenu', null, null, 1)" order="1">${field1 || 'announce'}</span>
+            code = `<span class="editable world selectionValue" tpmId="flushMessageMenu" contenteditable="true" onclick="popUpMenu(event,'flushMessageMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)" order="1">${field1 || 'announce'}</span>
                     <span class="toggleableField" style="display:block;" order="2">for</span>
                     <span class="editable world toggleableField"style="display:block;" contenteditable="true" order="2">${field2 || '3'}</span>
                     <span class="toggleableField" style="display:block;"order="2">sec</span>
                     <span>success</span>
                     <span class="editable world" contenteditable="true" order="3">${field3 || '@wait'}</span>`
-            tpmId = "flushMessageMenu"
             break;
         case 'Cutscene':
-            code = `<span class="editable world selectionValue" contenteditable="true" onclick="popUpMenu(event,'cutsceneMenu')" oninput="selectOption(event,'cutsceneMenu', null, null, 1)" order="1">${field1 || 'pan'}</span>
+            code = `<span class="editable world selectionValue" tpmId="cutsceneMenu" contenteditable="true" onclick="popUpMenu(event,'cutsceneMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)" order="1">${field1 || 'pan'}</span>
                     <span class="toggleableField" style="display:block;" order="22">x</span>
                     <span class="editable world toggleableField" style="display:block;" contenteditable="true" order="2">${field2 || '100'}</span>
                     <span class="toggleableField" style="display:block;" order="3">y</span>
                     <span class="editable world toggleableField" style="display:block;" contenteditable="true" order="3">${field3 || '100'}</span>
                     <span class="toggleableField" style="display:block;" order="4">speed</span>
                     <span class="editable world toggleableField" style="display:block;" contenteditable="true" order="4">${field4 || '0.06'}</span>`
-            tpmId = "cutsceneMenu"
             break;
         case 'Effect':
-            code = `<span class="editable world selectionValue" contenteditable="true" onclick="popUpMenu(event,'effectMenu')" oninput="selectOption(event,'effectMenu', null, null, 1)" order="1">${field1 || 'warn'}</span>
+            code = `<span class="editable world selectionValue" tpmId="effectMenu" contenteditable="true" onclick="popUpMenu(event,'effectMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)" order="1">${field1 || 'warn'}</span>
                     <span class="toggleableField" style="display:block;" order="2">x</span>
                     <span class="editable world toggleableField" style="display:block;" contenteditable="true" order="2">${field2 || '0'}</span>
                     <span class="toggleableField" style="display:block;" order="3">y</span>
@@ -383,7 +394,6 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="editable world toggleableField" contenteditable="true" order="4">${field4 || '2'}</span>
                     <span class="toggleableField" order="55">data</span>
                     <span class="editable world toggleableField" contenteditable="true" order="5">${field5 || '%ffaaff'}</span>`
-            tpmId = "effectMenu"
             break;
         case 'Explosion':
             code = `<span>team</span>
@@ -413,14 +423,13 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
         case 'Fetch':
             code = `<span class="editable world" style="display:block;" contenteditable="true" order="2">${field2 || 'result'}</span>
                     <span>=</span>
-                    <span class="editable world selectionValue" contenteditable="true" onclick="popUpMenu(event,'fetchMenu')" oninput="selectOption(event,'fetchMenu', null, null, 1)" order="1">${field1 || 'unit'}</span>
+                    <span class="editable world selectionValue" tpmId="fetchMenu" contenteditable="true" onclick="popUpMenu(event,'fetchMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)" order="1">${field1 || 'unit'}</span>
                     <span>team</span>
                     <span class="editable world" contenteditable="true" order="3">${field3 || '@sharded'}</span>
                     <span class="toggleableField" style="display:block;" order="44">#</span>
                     <span class="editable world toggleableField" style="display:block;" contenteditable="true" order="4">${field4 || '0'}</span>
                     <span class="toggleableField" style="display:block;" order="55">unit</span>
                     <span class="editable world toggleableField" style="display:block;" contenteditable="true" order="5">${field5 || '@conveyor'}</span>`
-            tpmId = "fetchMenu"
             break;
         case 'Sync':
             code = `<span class="editable world" contenteditable="true" order="1">${field1 || 'var'}</span>`
@@ -466,7 +475,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
             break;
         case 'Set Marker':
             code = `<span>set</span>
-                    <span class="editable world selectionValue" contenteditable="true" onclick="popUpMenu(event,'setMarkerMenu')" oninput="selectOption(event,'setMarkerMenu', null, null, 1)" order="1">${field1 || 'pos'}</span>
+                    <span class="editable world selectionValue" tpmId="setMarkerMenu"; contenteditable="true" onclick="popUpMenu(event,'setMarkerMenu')" oninput="selectOption(event,this.getAttribute('tpmId'), null, null, 1)" order="1">${field1 || 'pos'}</span>
                     <span class="toggleableField" style="display:block" order="22">of id#</span>
                     <span class="editable world toggleableField" style="display:block" contenteditable="true" order="2">${field2 || '0'}</span>
                     <span class="toggleableField" style="display:block" order="33">x</span>
@@ -476,7 +485,6 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                     <span class="toggleableField" order="55"></span>
                     <span class="editable world toggleableField" contenteditable="true" order="5">${field5 || '0'}</span>
                     `
-            tpmId = "setMarkerMenu";
             break;
         case 'Make Marker':
             code = `<span class="editable world selectionValue" contenteditable="true" onclick="popUpMenu(event,'makeMarkerMenu')" oninput="selectOption(event,'makeMarkerMenu', null, null, 1)" order="1">${field1 || 'shape'}</span>
@@ -531,33 +539,29 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
         </div>`
     );
 
-    newElement = lastContainer.nextElementSibling 
+    const newElement = lastContainer.nextElementSibling 
 
-    if (triggerPopupMenu) {      
-        // const onclickSpan = newElement.querySelectorAll('[onclick]')[2]
-        // onclickValue = (onclickSpan.getAttribute('onclick'));
-        // let args = onclickValue.match(/\((?:\d+,\s*)?'([^']*)'/);
-        // console.log(args); 
-                                    // probably shouldn't use ('[onclick]')[2]
-        selectOption(null,tpmId,(newElement.querySelectorAll('[onclick]')[2]),newElement.querySelector('.selectionValue').textContent)
-    }
-    if (update == 0){
-        return
-    } else {
+    if (update != 0) {
         updateLineNumber();
     }
     console.log(`${performance.now() - pfstart}`);
 
-    };
+    return newElement;
+};
 
 //count and update line number on instruction
+//also updates destinations of line number-based jumps
 
 function updateLineNumber() {
+    const lineNumberChanges = {}
+
     let jumpIns = [];
     containers = document.querySelectorAll('.container:not(#exclude)'); //can use :has() but i heard its not supported in older browser
     containers.forEach((container, index) => {
-        const lineNumberElement = container.querySelector('#lineNumber');
-        if (lineNumberElement) {
+        const lineNumberElement = containerr.querySelector('#lineNumber');
+        
+        if (lineNumberElement.textContent !== index) {
+            lineNumberChanges[lineNumberElement.textContent] = index;
             lineNumberElement.textContent = index;
         }
         if (!container.hasDown){
@@ -570,6 +574,11 @@ function updateLineNumber() {
             jumpIns.push(container)
         }
     });
+
+    jumpIns.forEach((jumpContainer) => {
+        const destElement = jumpContainer.querySelector('#field1Value');
+        destElement.textContent = lineNumberChanges[destElement.textContent] ?? destElement.textContent;
+    })
 
     labels = document.querySelectorAll('.container#exclude') //i know this is a shitty fix
     labels.forEach(label => {
@@ -955,8 +964,10 @@ keybindMap = {
     'y': 'Sensor',
     'a': 'Set',
     's': 'Operation',
-    'd': 'Lookup',
-    'f': 'Pack Color',
+    'd': 'Select',
+    'f': 'Lookup',
+    'g': 'Pack Color',
+    'h': 'Unpack Color',
     'z': 'Wait',
     'x': 'Stop',
     'c': 'End',
@@ -1399,7 +1410,7 @@ const handleEnd = (e) => {
                 lineNumberElement = container?.querySelector('#lineNumber')
                 lineNumber = lineNumberElement?.textContent
                 if (!lineNumber){
-                    lineNumber = container?.querySelector('#field1').textContent
+                    lineNumber = container?.querySelector('#field1').textContent ?? -1
                 }
                 parent = elementDragged.closest('.container')
                 thisLineNumber = parent.querySelector('#field1Value')
@@ -1759,6 +1770,25 @@ function selectOption(event,id,isImport,importSelectionValue,isOnInput,from) {
                 default:
                     main([1,2,3,4]);
                     firstVal.after(operator);
+                    break;
+            }
+            break;
+        case 'selectMenu':
+            switch(option){
+                case 'always':
+                    main([1,2,5,6])
+                    break;
+                case '==':
+                case 'not':
+                case '<':
+                case '<=':
+                case '>':
+                case '>=':
+                case '===':
+                    main([1,2,3,4,5,6])
+                    break;
+                default:
+                    console.error(`Unhandled selectMenu (jumpMenu) selection ${option}`);
                     break;
             }
             break;
@@ -2519,55 +2549,9 @@ const operatorMap = {
     "acos"      : 'acos',
     "atan"      : 'atan',
     "always"    : 'always',
+}
 
-    'add'               : 'add', // UGLY, idk other way though
-    'sub'               : 'sub',
-    'mul'               : 'mul',
-    'div'               : 'div',
-    'idiv'              : 'idiv',
-    'mod'               : 'mod',
-    'emod'              : 'emod',
-    'pow'               : 'pow',
-    'equal'             : 'equal',
-    'notEqual'          : 'notEqual',
-    'land'              : 'land',
-    'lessThan'          : 'lessThan',
-    'lessThanEqual'     : 'lessThanEqual',
-    'greaterThan'       : 'greaterThan',
-    'greaterThanEqual'  : 'greaterThanEqual',
-    'strictEqual'       : 'strictEqual',
-    'shl'               : 'shl',
-    'shr'               : 'shr',
-    'or'                : 'or',
-    'and'               : 'and',
-    'xor'               : 'xor',
-    // 'not'               : 'flip',
-    'max'               : 'max',
-    'min'               : 'min',
-    'angle'             : 'angle',
-    'angleDiff'         : 'angleDiff',
-    'len'               : 'len',
-    'noise'             : 'noise',
-    'abs'               : 'abs',
-    'sign'              : 'sign',
-    'log'               : 'log',
-    'logn'              : 'logn',
-    'log10'             : 'log10',
-    'floor'             : 'floor',
-    'ceil'              : 'ceil',
-    'round'             : 'round',
-    'sqrt'              : 'sqrt',
-    'rand'              : 'rand',
-    'sin'               : 'sin',
-    'cos'               : 'cos',
-    'tan'               : 'tan',
-    'asin'              : 'asin',
-    'acos'              : 'acos',
-    'atan'              : 'atan',
-    'always'            : 'always',
-};
-
-let instTypeMap = {
+const instTypeMap = {
     'Read'          : 'read',
     'Write'         : 'write',
     'Draw'          : 'draw',
@@ -2581,8 +2565,10 @@ let instTypeMap = {
     // 'Sensor'        : 'sensor',
     'Set'           : 'set',
     'Operation'     : 'op',
+    'Select'        : 'select',
     // 'Lookup'        : 'lookup',
     'Pack Color'    : 'packcolor',
+    'Unpack Color'  : 'unpackcolor',
     'Wait'          : 'wait',
     'Stop'          : 'stop',
     'End'           : 'end',
@@ -2618,8 +2604,8 @@ let instTypeMap = {
     'Make Marker'   : 'makemarker',
     'Locale Print'  : 'localeprint',
     'Print Char'    : 'printchar',
-
 } 
+
 function exportCode(save){
     // deselectContainer();
     codeEx = ""
@@ -2639,6 +2625,7 @@ function exportCode(save){
                     case 'Play Sound':
                     case 'Jump':
                     case 'Operation':
+                    case 'Select':
                         ignoreIgnoreInvisable = 1 
                         break;
                     default:
@@ -2736,7 +2723,7 @@ function exportCode(save){
                         // console.log(code);
                         codeId = code.id
                         if (codeId === 'operation'){
-                            codeEx += operatorMap[code.textContent] + ' '
+                            codeEx += (operatorMap[code.textContent] ?? code.textContent) + ' '
                         }else if (codeId === 'string') {
                             codeEx += (code.textContent + ' ');
                         } else {
@@ -2763,55 +2750,22 @@ function exportCode(save){
 }
 
 
-let instTypeMapR = {
-    'read'      : 'Read',
-    'write'     : 'Write',
-    'draw'      : 'Draw',
-    'print'     : 'Print',
-    'format'    : 'Format',
-    'drawflush' : 'Draw Flush',
-    'printflush': 'Print Flush',
-    'getlink'   : 'Get Link',
-    'control'   : 'Control',
-    'radar'     : 'Radar',
-    'sensor'    : 'Sensor',
-    'set'       : 'Set',
-    'op'        : 'Operation',
-    'lookup'    : 'Lookup',
-    'packcolor' : 'Pack Color',
-    'wait'      : 'Wait',
-    'stop'      : 'Stop',
-    'end'       : 'End',
-    'jump'      : 'Jump',
-    'ubind'     : 'Unit Bind',
-    'ucontrol'  : 'Unit Control',
-    'uradar'    : 'Unit Radar',
-    'ulocate'   : 'Unit Locate',
+const operatorMapR = Object.fromEntries(
+    Object.entries(operatorMap).map(([key, val]) => [val, key])
+);
 
-    'getblock'     : 'Get Block',
-    'setblock'     : 'Set Block',
-    'spawn'        : 'Spawn Unit',
-    'bullet'       : 'Spawn Bullet',
-    'status'       : 'Apply Status',
-    'weathersense' : 'Weather Sense',
-    'weatherset'   : 'Weather Set',
-    'spawnwave'    : 'Spawn Wave',
-    'setrule'      : 'Set Rule',
-    'message'      : 'Flush Message',
-    'cutscene'     : 'Cutscene',
-    'effect'       : 'Effect',
-    'explosion'    : 'Explosion',
-    'setrate'      : 'Set Rate',
-    'fetch'        : 'Fetch',
-    'sync'         : 'Sync',
-    'getflag'      : 'Get Flag',
-    'setflag'      : 'Set Flag',
-    'setprop'      : 'Set Prop',
-    'playsound'    : 'Play Sound',
-    'setmarker'    : 'Set Marker',
-    'localeprint'  : 'Locale Print',
-    'printchar'    : 'Print Char',
+let instTypeMapR = Object.fromEntries(
+    Object.entries(instTypeMap).map(([key, val]) => [val, key])
+);
+
+instTypeMapR = {
+    ...instTypeMapR,
+    'sensor': 'Sensor',
+    'lookup':'Lookup',
+    'ulocate': 'Unit Locate',
+    'status': 'Apply Status',
 }
+
 // ########################################################################################################################
 // import
 // ########################################################################################################################
@@ -2866,11 +2820,14 @@ async function importCode(manual,codeSaved){
         type = instTypeMapR[words[0]]
         if (type){
             // console.log(type);
-            let triggerPopupMenu // @Important, this triggers the popup change fields for imports, add new types here
-            if (['Control', 
+            // @Important, this triggers the popup change fields for imports, add new types here
+            const triggerPopupMenu = [
+                'Control', 
                 'Draw', 
                 'Unit Control', 
+                'Unit Locate',
                 'Operation',
+                'Select',
                 'Jump', 
                 'Set Rule', 
                 'Set Block', 
@@ -2879,10 +2836,27 @@ async function importCode(manual,codeSaved){
                 'Effect', 
                 'Fetch',
                 'Play Sound',
-                'Set Marker'].includes(type)) {
-                triggerPopupMenu = true
+                'Set Marker'
+            ].includes(type);
+
+
+            const inst = addInstruction(type, 0, ...words.slice(1));
+            if (triggerPopupMenu) {
+                const selectionSpan = inst.querySelector(".selectionValue");
+                // raw mlog name of the selection
+                const selection = selectionSpan.textContent;
+                const mappedSelection = operatorMapR[selection] ?? selection;
+
+                selectionSpan.textContent = mappedSelection;
+
+                selectOption(
+                    null,
+                    selectionSpan.getAttribute('tpmId'),
+                    inst.querySelector('.code').querySelector('[onclick]'),
+                    mappedSelection,
+                );
             }
-            addInstruction(type, 0, words[1], words[2], words[3], words[4], words[5], words[6], words[7], words[8], words[9], triggerPopupMenu)
+
         } else {
             if (words[0].endsWith(":")){
                 addInstruction('Label', 0, words[0].replace(":",""))
