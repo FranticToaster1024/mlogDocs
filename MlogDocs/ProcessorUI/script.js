@@ -555,19 +555,19 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
 function updateLineNumber() {
     let jumpIns = [];
     containers = document.querySelectorAll('.container:not(#exclude)'); //can use :has() but i heard its not supported in older browser
-    containers.forEach((containerr, index) => {
-        const lineNumberElement = containerr.querySelector('#lineNumber');
+    containers.forEach((container, index) => {
+        const lineNumberElement = container.querySelector('#lineNumber');
         if (lineNumberElement) {
             lineNumberElement.textContent = index;
         }
-        if (!containerr.hasDown){
-            MouseDown(containerr.querySelector('.block-header'),containerr)
+        if (!container.hasDown){
+            MouseDown(container.querySelector('.block-header'),container)
         }
-        if (!containerr.hasDownJump && containerr.querySelector('.jumpTo')){
-            MouseDown(containerr.querySelector('.jumpArrowTriangle'),containerr)
+        if (!container.hasDownJump && container.querySelector('.jumpTo')){
+            MouseDown(container.querySelector('.jumpArrowTriangle'),container)
         }
-        if ((containerr.querySelector('.headerText')).textContent == 'Jump'){
-            jumpIns.push(containerr)
+        if ((container.querySelector('.headerText')).textContent == 'Jump'){
+            jumpIns.push(container)
         }
     });
 
@@ -583,7 +583,7 @@ function updateLineNumber() {
 
 
 function assignLane(jumpSrc, jumpDest, lanes) {
-    if (jumpDest === undefined) return -1;
+    if (jumpDest === undefined) return null;
 
     const jumpMin = Math.min(jumpSrc, jumpDest);
     const jumpMax = Math.max(jumpSrc, jumpDest);
@@ -600,8 +600,7 @@ function assignLane(jumpSrc, jumpDest, lanes) {
     return lanes.length - 1;
 }
 
-const trailColors = ['#ffd700', '#da70d6', '#179fff'];
-const inboundArrowOffset = 16;
+
 const verticalCanvasPadding = 20;
 function updateJumpArrow(jumpIns) {
     const destinations = document.querySelectorAll('#lineNumber');
@@ -627,14 +626,28 @@ function updateJumpArrow(jumpIns) {
         .sort((a, b) => indexMap.get(a[0]) - indexMap.get(b[0]));
     
     jumpIns.forEach(([jump, destinationTarget]) => {
+        const containerRect = jump.getBoundingClientRect();
+        const destRect = destinationTarget?.getBoundingClientRect();
+
+        const distance = (containerRect.top + containerRect.height / 2)
+            - (destRect?.top + destRect?.height / 2)
+        
+        const jumpSrc = indexMap.get(jump);
+        const jumpDest = indexMap.get(destinationTarget);
+        const lane = assignLane(jumpSrc, jumpDest, lanes);
+        
+        const laneOffset = 40 + (lane * 10)
+        const slantDeltaY = Math.sign(distance) * laneOffset * 0.5
+
         const canvas = jump.querySelector('.jumpArrow');
-        // console.log(canvas);
 
-        const ctx = canvas.getContext('2d');
-        const containerrRect = jump.getBoundingClientRect();
+        canvas.height = Math.abs(distance) + 2 * verticalCanvasPadding
+        canvas.width = 150
+        
+        const destVerticalEdge = distance > 0
+            ? verticalCanvasPadding
+            : canvas.height - verticalCanvasPadding;
 
-        const desRect = destinationTarget?.getBoundingClientRect();
-        let distance = (containerrRect.top + containerrRect.height / 2) - (desRect?.top + desRect?.height / 2)
         if (distance > 0){
             canvas.style.bottom = `10%`
             canvas.style.top = ''
@@ -643,75 +656,102 @@ function updateJumpArrow(jumpIns) {
             canvas.style.bottom = ''
         }
         canvas.style.left = ''
-        distance = Math.abs(distance)
-        canvas.height = distance + 2 * verticalCanvasPadding
-        canvas.width = 150
+
+        const canvasRect = canvas.getBoundingClientRect();
+
+        const srcArrow = jump.querySelector('.jumpArrowTriangle')
+        const srcArrowRect = srcArrow.getBoundingClientRect();
+        const srcArrowMidY = (srcArrowRect.top - canvasRect.top) + srcArrowRect.height / 2;
+
+        const destArrowRect = destinationTarget?.querySelector('.jumpArrowTriangle')?.getBoundingClientRect();
+        const destArrowMidY = destArrowRect
+            ? destArrowRect.top - canvasRect.top
+            : null
+
+        drawJumpArrow(
+            canvas.getContext('2d'),
+            laneOffset,
+            srcArrowMidY,
+            slantDeltaY,
+            destVerticalEdge,
+            destArrowMidY,
+            lane,
+            srcArrow,
+        );
+    });
+}
 
 
-        const jumpSrc = indexMap.get(jump);
-        const jumpDest = indexMap.get(destinationTarget);
+const loadImg = (srcString) => {
+    const img = new Image()
 
-        const lane = assignLane(jumpSrc, jumpDest, lanes);
-        const laneOffset = 40 + (lane * 10)
-        const dy = (desRect && containerrRect.top === desRect.top) ? 0 : laneOffset/2
+    return new Promise((resolve, reject) => {
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("Image failed to load."));
 
-        ctx.strokeStyle = trailColors[lane % trailColors.length];
-        ctx.fillStyle = trailColors[lane % trailColors.length];
-        ctx.lineWidth = 4
-        
-        const img = new Image();
-        img.onload = () => {
-            function drawFlippedWithColor(x, y) {
-                ctx.save();
-                ctx.translate(x + img.width, y);
-                ctx.scale(-1, 1);
-                ctx.drawImage(img, 0, 0);
+        img.src = srcString;
+    });
+}
+const trailColors = ['#ffd700', '#da70d6', '#179fff'];
+async function drawJumpArrow(
+    ctx,
+    laneOffset,
+    srcArrowMidY,
+    slantDeltaY,
+    destVerticalEdge,
+    destArrowMidY,
+    lane,
+    srcArrowElement,
+) {
+    if (lane === null) {
+        srcArrowElement.src = 'image/logic-node.png';
+        return;
+    }
 
-                ctx.globalCompositeOperation = 'source-in';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.globalCompositeOperation = 'source-over';
 
-                ctx.restore();
-            }
+    const trailColor = trailColors[lane % trailColors.length];
 
-            const canvasRect = canvas.getBoundingClientRect();
 
-            const srcArrowRect = jump.querySelector('.jumpArrowTriangle').getBoundingClientRect();
-            const srcArrowMidY = (srcArrowRect.top - canvasRect.top) + srcArrowRect.height / 2;
+    // use a canvas to color the logic-node image
+    // this is used for both the src and dest arrow
+    const coloredArrow = document.createElement('canvas')
+    coloredArrow.width = srcArrowElement.width;
+    coloredArrow.height = srcArrowElement.height;
 
-            const desArrowRect = destinationTarget?.querySelector('.jumpArrowTriangle')?.getBoundingClientRect();
-            const desArrowMidY = desArrowRect
-                ? desArrowRect.top - canvasRect.top
-                : null
-            
-            ctx.beginPath()
-            if (canvas.style.bottom === ''){
-                // going down
-                ctx.moveTo(5, srcArrowMidY) // the 5 is a magic value ¯\_(ツ)_/¯
-                ctx.lineTo(laneOffset, srcArrowMidY + dy)
+    const tmpCtx = coloredArrow.getContext('2d');
+    tmpCtx.fillStyle = trailColor;
 
-                const bottom = canvas.height - verticalCanvasPadding;
-                const arrowEndY = desArrowMidY ?? bottom - img.height / 2;
-                ctx.lineTo(laneOffset, arrowEndY - dy)
-                // divide x by 2 cuz the arrow only occupies half the image horizontally
-                ctx.lineTo(img.width / 2, arrowEndY)
-                drawFlippedWithColor(0, arrowEndY - img.height / 2)
-            } else {
-                // going up
-                ctx.moveTo(5, srcArrowMidY)
-                ctx.lineTo(laneOffset, srcArrowMidY - dy)
+    tmpCtx.drawImage(await loadImg('image/logic-node.png'), 0, 0);
+    // color the img
+    tmpCtx.globalCompositeOperation = 'source-in';
+    tmpCtx.fillRect(0, 0, coloredArrow.width, coloredArrow.height);
+    tmpCtx.globalCompositeOperation = 'source-over';
 
-                const top = verticalCanvasPadding;
-                const arrowEndY = desArrowMidY ?? top - img.height / 2;
-                ctx.lineTo(laneOffset, arrowEndY + dy)
-                ctx.lineTo(img.width / 2, arrowEndY)
-                drawFlippedWithColor(0, arrowEndY - img.height / 2)
-            }
-            ctx.stroke();
-        };
-        img.src = "image/logic-node.png";
-    // ctx.quadraticCurveTo(100, distance/2, 0, 0);
-    })
+
+    srcArrowElement.src = coloredArrow.toDataURL('image/png');
+
+
+    ctx.strokeStyle = trailColor;
+    ctx.fillStyle = trailColor;
+    ctx.lineWidth = 4
+
+    const arrowEndY = destArrowMidY ?? destVerticalEdge - coloredArrow.height / 2;
+
+    ctx.beginPath()
+    ctx.moveTo(5, srcArrowMidY) // the 5 is a magic value ¯\_(ツ)_/¯
+    ctx.lineTo(laneOffset, srcArrowMidY - slantDeltaY)
+
+    ctx.lineTo(laneOffset, arrowEndY + slantDeltaY)
+    // divide x by 2 cuz the arrow only occupies half the image horizontally
+    ctx.lineTo(coloredArrow.width / 2, arrowEndY)
+    ctx.stroke();
+
+    // draw flipped icon at (0, arrowEndY - arrowImg.height / 2)
+    ctx.save();
+    ctx.translate(coloredArrow.width, arrowEndY - coloredArrow.height / 2);
+    ctx.scale(-1, 1);
+    ctx.drawImage(coloredArrow, 0, 0);
+    ctx.restore();
 }
 
 //##############
