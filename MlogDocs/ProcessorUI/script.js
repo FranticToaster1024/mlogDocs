@@ -712,6 +712,8 @@ function updateJumpArrow(jumpIns) {
             slantDeltaY,
             destVerticalEdge,
             destArrowMidY,
+            lane,
+            srcArrow,
         );
     });
 }
@@ -732,6 +734,7 @@ const loadImg = (srcString) => new Promise((resolve, reject) => {
     img.src = srcString;
 });
 
+const goldenRatioConjugate = 0.6180339887498949;
 async function drawJumpArrow(
     ctx,
     laneOffset,
@@ -739,13 +742,44 @@ async function drawJumpArrow(
     slantDeltaY,
     destVerticalEdge,
     destArrowMidY,
+    lane,
+    srcArrowElement,
 ) {
+    if (lane === null) {
+        srcArrowElement.src = 'image/logic-node.png';
+        return;
+    }
+
+
+    const arrowColorHue = (lane * goldenRatioConjugate) % 1;
+    const arrowColor = `hsl(${Math.round(arrowColorHue * 360)}, 80%, 80%)`;
+
     const arrowImage = await loadImg('image/logic-node.png')
 
-    ctx.strokeStyle = 'white';
+    // use a canvas to color the logic-node image
+    // this is used for both the src and dest arrow
+    const coloredArrow = document.createElement('canvas')
+    coloredArrow.width = arrowImage.naturalWidth;
+    coloredArrow.height = arrowImage.naturalHeight;
+
+    const tmpCtx = coloredArrow.getContext('2d');
+    tmpCtx.fillStyle = arrowColor;
+
+    tmpCtx.drawImage(arrowImage, 0, 0);
+    // color the img
+    tmpCtx.globalCompositeOperation = 'source-in';
+    tmpCtx.fillRect(0, 0, coloredArrow.width, coloredArrow.height);
+    tmpCtx.globalCompositeOperation = 'source-over';
+
+
+    srcArrowElement.src = coloredArrow.toDataURL('image/png');
+
+
+    ctx.strokeStyle = arrowColor;
+    ctx.fillStyle = arrowColor;
     ctx.lineWidth = 4
 
-    const arrowEndY = destArrowMidY ?? destVerticalEdge - arrowImage.height / 2;
+    const arrowEndY = destArrowMidY ?? destVerticalEdge - coloredArrow.height / 2;
 
     ctx.beginPath()
     ctx.moveTo(5, srcArrowMidY) // the 5 is a magic value ¯\_(ツ)_/¯
@@ -753,14 +787,14 @@ async function drawJumpArrow(
 
     ctx.lineTo(laneOffset, arrowEndY + slantDeltaY)
     // divide x by 2 cuz the arrow only occupies half the image horizontally
-    ctx.lineTo(arrowImage.width / 2, arrowEndY)
+    ctx.lineTo(coloredArrow.width / 2, arrowEndY)
     ctx.stroke();
 
     // draw flipped icon at (0, arrowEndY - arrowImg.height / 2)
     ctx.save();
-    ctx.translate(arrowImage.width, arrowEndY - arrowImage.height / 2);
+    ctx.translate(coloredArrow.width, arrowEndY - coloredArrow.height / 2);
     ctx.scale(-1, 1);
-    ctx.drawImage(arrowImage, 0, 0);
+    ctx.drawImage(coloredArrow, 0, 0);
     ctx.restore();
 }
 
