@@ -591,24 +591,6 @@ function updateLineNumber() {
 }
 
 
-function assignLane(jumpSrc, jumpDest, lanes) {
-    if (jumpDest === undefined) return null;
-
-    const jumpMin = Math.min(jumpSrc, jumpDest);
-    const jumpMax = Math.max(jumpSrc, jumpDest);
-
-    for (const [i, lane] of lanes.entries()) {
-        if (jumpMin >= lane.max || lane.dests.has(jumpDest)) {
-            lane.max = Math.max(jumpMax, lane.max);
-            lane.dests.add(jumpDest);
-            return i;
-        }
-    }
-
-    lanes.push({ max: jumpMax, dests: new Set([jumpDest]) });
-    return lanes.length - 1;
-}
-
 
 const waitImgLoad = (img) => new Promise((resolve, reject) => {
     if (!img) {
@@ -631,38 +613,9 @@ const waitImgLoad = (img) => new Promise((resolve, reject) => {
 
 const verticalCanvasPadding = 20;
 function updateJumpArrow(jumpIns) {
-    const destinations = document.querySelectorAll('#lineNumber');
-    const labels = document.querySelectorAll('.container#exclude');
-    function getDestTgt (jump) {
-        let destinationTarget = destinations[parseInt(jump.querySelector('#field1Value').textContent)]?.closest('.container')
-        if (!destinationTarget && labels){
-            labels.forEach(label => {
-                if (label.querySelector('#field1').textContent == jump.querySelector('#field1Value').textContent){
-                    return label
-                }
-            })
-        }
-        return destinationTarget
-    }
+    const jumpsWithLanes = assignLanes(jumpIns);
 
-    const containers = Array.from(document.querySelectorAll('.container'));
-    const indexMap = new Map(containers.map((item, idx) => [item, idx]));
-
-    const lanes = [];
-    const jumpsWithLanes = jumpIns
-        .map((jump) => [jump.closest('.container'), getDestTgt(jump)])
-        .sort((a, b) => indexMap.get(a[0]) - indexMap.get(b[0]))
-        .map(([jump, destinationTarget]) => ({
-            jump,
-            destinationTarget,
-            lane: assignLane(
-                indexMap.get(jump),
-                indexMap.get(destinationTarget),
-                lanes,
-            ),
-        }));
-    
-    jumpsWithLanes.forEach(async ({ jump, destinationTarget, lane }) => {
+    jumpsWithLanes.forEach(async ({ src: jump, dest: destinationTarget, lane }) => {
         const srcArrow = await waitImgLoad(jump.querySelector('.jumpArrowTriangle'));
         const destArrow = await waitImgLoad(
             destinationTarget?.querySelector('.jumpArrowTriangle')
@@ -718,6 +671,109 @@ function updateJumpArrow(jumpIns) {
     });
 }
 
+// based on
+// https://github.com/Anuken/Mindustry/blob/master/core/src/mindustry/logic/LCanvas.java
+function assignLanes(jumpIns) {
+    const destinations = document.querySelectorAll('#lineNumber');
+    const labels = document.querySelectorAll('.container#exclude');
+    function getDestTgt (jump) {
+        let destinationTarget = destinations[parseInt(jump.querySelector('#field1Value').textContent)]?.closest('.container')
+        if (!destinationTarget && labels){
+            labels.forEach(label => {
+                if (label.querySelector('#field1').textContent == jump.querySelector('#field1Value').textContent){
+                    destinationTarget = label;
+                }
+            })
+        }
+        return destinationTarget
+    }
+
+    const containers = Array.from(document.querySelectorAll('.container'));
+    const indexMap = new Map(containers.map((item, idx) => [item, idx]));
+
+    const allJumps = [];    
+    const jumpsUp = new Map();
+    const jumpsDown = new Map();
+    for (const jumpIn of jumpIns) {
+        const src = jumpIn.closest('.container');
+        const dest = getDestTgt(src);
+
+        const srcLine = indexMap.get(src);
+        const destLine = indexMap.get(dest);
+        
+        const min = Math.min(srcLine, destLine);
+        const max = Math.max(srcLine, destLine);
+
+        const upward = destLine !== undefined && srcLine >= destLine;
+
+        const jump = { src, dest, srcLine, destLine, min, max, upward };
+        allJumps.push(jump);
+
+        if (destLine === undefined) { continue; }
+
+        if (upward) {
+            const prev = jumpsUp.get(destLine);
+            if (prev && srcLine <= prev.srcLine) { continue; }
+            jumpsUp.set(destLine, jump);
+        } else {
+            const prev = jumpsDown.get(destLine);
+            if (prev && srcLine >= prev.srcLine) { continue; }
+            jumpsDown.set(destLine, jump);
+        }
+    };
+
+    const groupedJumps = [...jumpsUp.values(), ...jumpsDown.values()]
+        .sort((a, b) => a.min - b.min);
+
+    const activeJumps = new Map();
+    for (const [i, currJump] of groupedJumps.entries()) {
+        for (const [lane, jump] of activeJumps) {
+            if (jump.max <= currJump.min) { activeJumps.delete(lane); }
+        }
+
+        const currLane = getLane(i, groupedJumps, activeJumps);
+        activeJumps.set(currLane, currJump);
+    }
+
+    for (const jump of allJumps) {
+        if (jump.destLine === undefined) { continue; }
+        jump.lane = (jump.upward ? jumpsUp : jumpsDown).get(jump.destLine).lane;
+    }
+
+    return allJumps;
+}
+
+function getLane(index, groupedJumps, activeJumps) {
+    const jump = groupedJumps[index];
+    if (jump.lane !== undefined) { return jump.lane; }
+
+    const currActiveJumps = new Map(activeJumps);
+
+    let maxLane = -1;
+    for (let i = index + 1; i < groupedJumps.length; i++) {
+        const currJump = groupedJumps[i];
+        if (currJump.max > jump.max) { continue; }
+
+        for (const [lane, jump] of currActiveJumps) {
+            if (jump.max <= currJump.min) { currActiveJumps.delete(lane); }
+        }
+
+        const currLane = getLane(i, groupedJumps, currActiveJumps);
+        currActiveJumps.set(currLane, currJump);
+        maxLane = Math.max(maxLane, currLane);
+    }
+
+    let i = maxLane + 1;
+    while (true) {
+        if (!activeJumps.has(i)) { break; }
+        i += 1;
+    }
+
+    jump.lane = i;
+    return jump.lane;
+}
+
+
 
 const loadImg = (srcString) => new Promise((resolve, reject) => {
     const img = new Image()
@@ -745,7 +801,7 @@ async function drawJumpArrow(
     lane,
     srcArrowElement,
 ) {
-    if (lane === null) {
+    if (lane === null || lane === undefined) {
         srcArrowElement.src = 'image/logic-node.png';
         return;
     }
