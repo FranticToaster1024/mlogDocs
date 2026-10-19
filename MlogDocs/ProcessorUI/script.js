@@ -185,7 +185,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                         <span>Jump To</span>
                         <span class="editable flowControl" id="field1Value" contenteditable="true" draggable="false" onclick="jumpDestination(event)" order="1">${field1 || '-1'}</span>
                     </div>
-                    <canvas class="jumpArrow" width=60></canvas>
+                    <canvas class="jumpArrow" width=150></canvas>
                     <img src="image/logic-node.png" alt="" class="jumpArrowTriangle" draggable="false">`
             break;
         case 'Unit Bind':
@@ -533,6 +533,7 @@ function addInstruction(button, update, field1, field2, field3, field4, field5, 
                 <div class="block-content">
                     <div class="code">
                         ${code}
+                        <img src="image/logic-node.png" alt="" class="jumpArrowHead" draggable="false" data-color-weight='0'>
                     </div>
                 </div>
             </div>
@@ -557,20 +558,21 @@ function updateLineNumber() {
 
     let jumpIns = [];
     containers = document.querySelectorAll('.container:not(#exclude)'); //can use :has() but i heard its not supported in older browser
-    containers.forEach((containerr, index) => {
-        const lineNumberElement = containerr.querySelector('#lineNumber');
+    containers.forEach((container, index) => {
+        const lineNumberElement = container.querySelector('#lineNumber');
+        
         if (lineNumberElement.textContent !== index) {
             lineNumberChanges[lineNumberElement.textContent] = index;
             lineNumberElement.textContent = index;
         }
-        if (!containerr.hasDown){
-            MouseDown(containerr.querySelector('.block-header'),containerr)
+        if (!container.hasDown){
+            MouseDown(container.querySelector('.block-header'),container)
         }
-        if (!containerr.hasDownJump && containerr.querySelector('.jumpTo')){
-            MouseDown(containerr.querySelector('.jumpArrowTriangle'),containerr)
+        if (!container.hasDownJump && container.querySelector('.jumpTo')){
+            MouseDown(container.querySelector('.jumpArrowTriangle'),container)
         }
-        if ((containerr.querySelector('.headerText')).textContent == 'Jump'){
-            jumpIns.push(containerr)
+        if ((container.querySelector('.headerText')).textContent == 'Jump'){
+            jumpIns.push(container)
         }
     });
 
@@ -586,79 +588,332 @@ function updateLineNumber() {
         }
     })
     updateJumpArrow(jumpIns)
-    // console.log(jumpIns);
 }
 
+
+
+const waitImgLoad = (img) => new Promise((resolve, reject) => {
+    if (!img) {
+        resolve(img);
+        return;
+    }
+
+    if (img.complete) {
+        if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+            reject(new Error('Image has invalid dimensions.'));
+            return;
+        }
+        resolve(img);
+        return;
+    }
+
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Image failed to load.'));
+});
+
+const verticalCanvasPadding = 20;
 function updateJumpArrow(jumpIns) {
+    document.querySelectorAll('.container').forEach(container => {
+        const arrowHead = container.querySelector('.jumpArrowHead');
+        arrowHead.dataset.colorWeight = 0;
+        arrowHead.style.visibility = '';
+    });
+
     jumpIns.forEach(jump => {
         const canvas = jump.querySelector('.jumpArrow');
-        // console.log(canvas);
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    });
 
-        const ctx = canvas.getContext('2d');
-        const containerrRect = (jump.closest('.container')).getBoundingClientRect();
-        const destinations = document.querySelectorAll('#lineNumber');
+    const jumpsWithLanes = assignLanes(jumpIns);
 
-        let destinationTarget = destinations[parseInt(jump.querySelector('#field1Value').textContent)]?.closest('.container')
-        if (!destinationTarget){
-            labels = document.querySelectorAll('.container#exclude')
-            if (labels){
-                labels.forEach(label => {
-                    if (label.querySelector('#field1').textContent == jump.querySelector('#field1Value').textContent){
-                        destinationTarget = label
-                    }
-                })
-            }
+    jumpsWithLanes.forEach(async ({ src: jump, dest: destinationTarget, lane }) => {
+        if (!destinationTarget) {
+            jump.querySelector('.jumpArrowTriangle').src = 'image/logic-node.png';
+            return;
         }
 
-        const desRect = destinationTarget?.getBoundingClientRect(); 
-        let distance = (containerrRect.top + containerrRect.height / 2) - (desRect?.top + desRect?.height / 2)
-        if (distance > 0){
+        const srcArrow = await waitImgLoad(jump.querySelector('.jumpArrowTriangle'));
+        const arrowHead = await waitImgLoad(
+            destinationTarget?.querySelector('.jumpArrowHead')
+        );
+
+        const containerRect = jump.getBoundingClientRect();
+        const destRect = destinationTarget?.getBoundingClientRect();
+
+        const destMidY = (destRect?.top + destRect?.height / 2);
+
+        const distance = (containerRect.top + containerRect.height / 2) - destMidY;
+        
+        const laneOffset = 40 + (lane * 10)
+        const slantDeltaY = Math.sign(distance) * laneOffset / 2;
+
+        const canvas = jump.querySelector('.jumpArrow');
+
+        canvas.height = Math.abs(distance) + 2 * verticalCanvasPadding
+        canvas.width = 150
+
+        if (distance >= 0){
             canvas.style.bottom = `10%`
             canvas.style.top = ''
-        }else {
+        } else {
             canvas.style.top = `10%`
             canvas.style.bottom = ''
         }
         canvas.style.left = ''
-        distance = Math.abs(distance)
-        canvas.height = distance+20
-        canvas.width = 100
 
-        // im so lazy so optimize this, point is it works
-        ctx.strokeStyle = 'white'
-        ctx.lineWidth = 2
-        if (canvas.style.bottom === ''){
-            ctx.beginPath()
-            ctx.moveTo(10, distance+10)
-            ctx.bezierCurveTo(100, distance/0.95, 100, distance/1024, 0, 10)
-            ctx.stroke()
-            ctx.closePath()
-            ctx.beginPath()
-            const bottom = distance+20
-            ctx.moveTo(15,bottom - 5)
-            ctx.lineTo(15,bottom - 15)
-            ctx.lineTo(5,bottom - 10)
-            ctx.closePath()
-            ctx.fillStyle = 'white';
-            ctx.fill()
-            ctx.stroke();
-        } else {
-            ctx.beginPath()
-            ctx.moveTo(0, distance + 10)
-            ctx.bezierCurveTo(100, distance/1.05, 100, distance/1024, 10, 10)
-            ctx.stroke()
-            ctx.closePath()
-            ctx.beginPath()
-            ctx.moveTo(15,5)
-            ctx.lineTo(15,15)
-            ctx.lineTo(5,10)
-            ctx.closePath()
-            ctx.fillStyle = 'white';
-            ctx.fill()
-            ctx.stroke();
+        const canvasRect = canvas.getBoundingClientRect();
+
+        const srcArrowRect = srcArrow.getBoundingClientRect();
+        const srcArrowMidY = (srcArrowRect.top - canvasRect.top) + srcArrowRect.height / 2;
+
+        const arrowHeadRect = arrowHead.getBoundingClientRect();
+        const arrowHeadMidY = (arrowHeadRect.top + arrowHeadRect.bottom) / 2
+            - canvasRect.top;
+
+        await drawJumpArrow(
+            canvas.getContext('2d'),
+            laneOffset,
+            srcArrowMidY,
+            arrowHeadMidY,
+            slantDeltaY,
+            lane,
+            srcArrow,
+            arrowHead,
+        );
+    });
+}
+
+
+// based on
+// https://github.com/Anuken/Mindustry/blob/master/core/src/mindustry/logic/LCanvas.java
+function assignLanes(jumpIns) {
+    const destinations = document.querySelectorAll('#lineNumber');
+    const labels = document.querySelectorAll('.container#exclude');
+    function getDestTgt (jump) {
+        let destinationTarget = destinations[parseInt(jump.querySelector('#field1Value').textContent)]?.closest('.container')
+        if (!destinationTarget && labels){
+            for (const label of labels) {
+                if (label.querySelector('#field1').textContent == jump.querySelector('#field1Value').textContent){
+                    return label;
+                }
+            }
         }
-    // ctx.quadraticCurveTo(100, distance/2, 0, 0);
-    })
+        return destinationTarget
+    }
+
+    const containers = Array.from(document.querySelectorAll('.container'));
+    const indexMap = new Map(containers.map((item, idx) => [item, idx]));
+
+    const allJumps = [];    
+    const jumpsUp = new Map();
+    const jumpsDown = new Map();
+    for (const jumpIn of jumpIns) {
+        const src = jumpIn.closest('.container');
+        const dest = getDestTgt(src);
+
+        const srcLine = indexMap.get(src);
+        const destLine = indexMap.get(dest);
+        
+        const min = Math.min(srcLine, destLine);
+        const max = Math.max(srcLine, destLine);
+
+        const upward = destLine !== undefined && srcLine >= destLine;
+
+        const jump = { src, dest, srcLine, destLine, min, max, upward };
+        allJumps.push(jump);
+
+        if (destLine === undefined) { continue; }
+
+        if (upward) {
+            const prev = jumpsUp.get(destLine);
+            if (prev && srcLine <= prev.srcLine) { continue; }
+            jumpsUp.set(destLine, jump);
+        } else {
+            const prev = jumpsDown.get(destLine);
+            if (prev && srcLine >= prev.srcLine) { continue; }
+            jumpsDown.set(destLine, jump);
+        }
+    };
+
+    const groupedJumps = [...jumpsUp.values(), ...jumpsDown.values()]
+        .sort((a, b) => a.min - b.min);
+
+    const activeJumps = new Map();
+    for (const [i, currJump] of groupedJumps.entries()) {
+        const currLane = getLane(i, groupedJumps, activeJumps);
+        activeJumps.set(currLane, currJump);
+    }
+
+    for (const jump of allJumps) {
+        if (jump.destLine === undefined) { continue; }
+        jump.lane = (jump.upward ? jumpsUp : jumpsDown).get(jump.destLine).lane;
+    }
+
+    return allJumps;
+}
+
+function getLane(index, groupedJumps, activeJumps) {
+    const jump = groupedJumps[index];
+    if (jump.lane !== undefined) { return jump.lane; }
+
+    const currActiveJumps = new Map(activeJumps);
+
+    let maxLane = -1;
+    for (let i = index + 1; i < groupedJumps.length; i++) {
+        const currJump = groupedJumps[i];
+        if (currJump.min > jump.max) { break; }
+        if (currJump.max > jump.max) { continue; }
+
+        const currLane = getLane(i, groupedJumps, currActiveJumps);
+        currActiveJumps.set(currLane, currJump);
+        maxLane = Math.max(maxLane, currLane);
+    }
+
+    let i = maxLane + 1;
+    while (true) {
+        const currJump = activeJumps.get(i);
+        if (!currJump || currJump.max <= jump.min) {
+            break;
+        }
+        i += 1;
+    }
+
+    jump.lane = i;
+    return jump.lane;
+}
+
+
+const loadImg = (srcString) => new Promise((resolve, reject) => {
+    const img = new Image()
+
+    img.onload = () => {
+        if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+            reject(new Error(`Image '${srcString}' loaded with invalid dimensions.`));
+            return;
+        }
+        resolve(img);
+    };
+    img.onerror = () => reject(new Error('Image failed to load.'));
+
+    img.src = srcString;
+});
+
+const goldenRatioConjugate = 0.6180339887498949;
+// offscreen canvas used to convert colors to rgb without math
+const colorConversionCanvas = document.createElement('canvas');
+const colorConversionCtx = colorConversionCanvas.getContext('2d', {
+    willReadFrequently: true
+});
+async function drawJumpArrow(
+    ctx,
+    laneOffset,
+    srcArrowMidY,
+    arrowHeadMidY,
+    slantDeltaY,
+    lane,
+    srcArrowElement,
+    arrowHeadElement,
+) {
+    if (lane === null || lane === undefined) {
+        srcArrowElement.src = 'image/logic-node.png';
+        return;
+    }
+
+    function colorImgAsCanvas(img, color) {
+        const coloredCanvas = document.createElement('canvas')
+        coloredCanvas.width = img.naturalWidth;
+        coloredCanvas.height = img.naturalHeight;
+
+        const tmpCtx = coloredCanvas.getContext('2d');
+        tmpCtx.fillStyle = color;
+
+        tmpCtx.drawImage(img, 0, 0);
+        // color the img
+        tmpCtx.globalCompositeOperation = 'source-in';
+        tmpCtx.fillRect(0, 0, coloredCanvas.width, coloredCanvas.height);
+        tmpCtx.globalCompositeOperation = 'source-over';
+
+        return coloredCanvas;
+    }
+
+    function colToRgb(col) {
+        col = col.trim();
+
+        if (col.startsWith('rgb')) {
+            const [r, g, b] = col.match(/[\d.]+/g).map(Number);
+            return {r, g, b};
+        }
+
+        if (col.startsWith('#') && col.length == 7) {
+            const num = parseInt(col.replace('#',''), 16);
+            return {
+                r: (num >> 16) & 255,
+                g: (num >> 8) & 255,
+                b: num & 255,
+            };
+        } else {
+            colorConversionCtx.fillStyle = col;
+            colorConversionCtx.fillRect(0, 0, 1, 1);
+            const [r, g, b] = colorConversionCtx.getImageData(0, 0, 1, 1).data;
+            return {r, g, b};
+        }
+    }
+
+    const arrowColorHue = (lane * goldenRatioConjugate) % 1;
+    const arrowColor = `hsl(${Math.round(arrowColorHue * 360)} 80% 80%)`;
+
+    const arrowImage = await loadImg('image/logic-node.png')
+    const coloredArrow = colorImgAsCanvas(arrowImage, arrowColor);
+
+    srcArrowElement.src = coloredArrow.toDataURL('image/png');
+
+    ctx.strokeStyle = arrowColor;
+    ctx.fillStyle = arrowColor;
+    ctx.lineWidth = 4
+
+    ctx.beginPath()
+    ctx.moveTo(5, srcArrowMidY) // the 5 is a magic value ¯\_(ツ)_/¯
+    ctx.lineTo(laneOffset, srcArrowMidY - slantDeltaY)
+
+    ctx.lineTo(laneOffset, arrowHeadMidY + slantDeltaY)
+    // divide x by 2 cuz the arrow only occupies half the image horizontally
+    ctx.lineTo(coloredArrow.width / 2, arrowHeadMidY)
+    ctx.stroke();
+
+
+    const colorWeight = Number(arrowHeadElement.dataset.colorWeight);
+    if (colorWeight === 0) {
+        arrowHeadElement.src = coloredArrow.toDataURL('image/png');
+        arrowHeadElement.dataset.color = arrowColor;
+        arrowHeadElement.dataset.lanes = `[${lane}]`;
+        arrowHeadElement.dataset.colorWeight = 1;
+    } else {
+        const lanes = JSON.parse(arrowHeadElement.dataset.lanes);
+
+        if (!lanes.includes(lane)) {
+            lanes.push(lane);
+            arrowHeadElement.dataset.lanes = JSON.stringify(lanes);
+
+            const prevColor = colToRgb(arrowHeadElement.dataset.color);
+            const currColor = colToRgb(arrowColor);
+            const newColor = {
+                r: (prevColor.r * colorWeight + currColor.r) / (colorWeight + 1),
+                g: (prevColor.g * colorWeight + currColor.g) / (colorWeight + 1),
+                b: (prevColor.b * colorWeight + currColor.b) / (colorWeight + 1),
+            };
+
+            arrowHeadElement.dataset.color =
+                `rgb(${newColor.r} ${newColor.g} ${newColor.b})`;
+            arrowHeadElement.dataset.colorWeight = colorWeight + 1;
+
+            arrowHeadElement.src = colorImgAsCanvas(
+                arrowImage,
+                arrowHeadElement.dataset.color
+            ).toDataURL('image/png');
+        }
+    }
+
+    arrowHeadElement.style.visibility = 'visible';
 }
 
 //##############
@@ -1224,6 +1479,7 @@ const handleMove = (e) => {
 
         ctx.beginPath()
         ctx.moveTo(moveTo[0],moveTo[1])
+        // TODO
         ctx.bezierCurveTo(curveTo[0], curveTo[1], 
                         curveTo[2], curveTo[3],
                         curveTo[4], curveTo[5])
